@@ -6,6 +6,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import tarfile
 import tempfile
@@ -170,6 +171,15 @@ class InstallationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             init_job.initialize(output)
         self.assertEqual(original.read_text(), "approved work")
+
+    def test_new_job_documentation_links_resolve_outside_skill(self) -> None:
+        output = self.directory / "elsewhere/new-job"
+        init_job.initialize(output)
+        for document in (output / "templates").glob("*.md"):
+            for link in re.findall(r"\[[^\]]+\]\(([^)]+)\)", document.read_text(encoding="utf-8")):
+                if link.startswith(("http:", "https:", "file:", "#")):
+                    continue
+                self.assertTrue((document.parent / link).exists(), f"Broken link in {document.name}")
 
 
 if __name__ == "__main__":

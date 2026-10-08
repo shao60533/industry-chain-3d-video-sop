@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
+import re
 import shutil
 import tempfile
 
@@ -21,6 +23,20 @@ def initialize(output: Path) -> None:
     with tempfile.TemporaryDirectory(prefix=".video-job-", dir=output.parent) as temporary:
         stage = Path(temporary) / "job"
         shutil.copytree(ROOT / "templates/next-episode", stage / "templates")
+        # Keep links to skill documentation valid when a job lives elsewhere.
+        for document in (stage / "templates").glob("*.md"):
+            def relocate(match: re.Match) -> str:
+                label, target = match.groups()
+                if not target.startswith("../../docs/"):
+                    return match.group(0)
+                reference = ROOT / "docs" / target.removeprefix("../../docs/")
+                try:
+                    link = Path(os.path.relpath(reference, output / "templates")).as_posix()
+                except ValueError:  # Windows jobs may be on another drive.
+                    link = reference.as_uri()
+                return f"[{label}]({link})"
+            text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", relocate, document.read_text(encoding="utf-8"))
+            document.write_text(text, encoding="utf-8")
         for name in STAGES:
             (stage / name).mkdir()
         job = json.loads((stage / "templates/job.template.json").read_text(encoding="utf-8"))
