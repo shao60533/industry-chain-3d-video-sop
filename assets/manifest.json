@@ -1,0 +1,50 @@
+{
+  "schema": "public-gallery-assets-1",
+  "assets": [
+    {
+      "file": "hero.png",
+      "origin": "新生成的 Codex 项目概念封面",
+      "kind": "concept_illustration",
+      "width": 2172,
+      "height": 724,
+      "metadata_stripped": true,
+      "sha256": "5c086ae7178a5e719575e2cdb7ffb1cbc2d3e2c350a39863c5cc4006e80a7e4c"
+    },
+    {
+      "file": "semiconductor-exploded.png",
+      "origin": "已有原创芯片封装分层渲染预览",
+      "kind": "original_render_preview",
+      "width": 720,
+      "height": 960,
+      "metadata_stripped": true,
+      "sha256": "45b5215446b045e7c9fb03546a0d99849de61dac4f66cbb4e09191fde1cc563a"
+    },
+    {
+      "file": "substrate-detail.png",
+      "origin": "已有原创基板焊盘与器件细节渲染预览",
+      "kind": "original_render_preview",
+      "width": 720,
+      "height": 960,
+      "metadata_stripped": true,
+      "sha256": "59e50f910746f6f7743121f45ae55f56e4b572d38e622df15285c82db58ca80d"
+    },
+    {
+      "file": "robot-joint.png",
+      "origin": "已有原创机器人肩臂关节渲染预览",
+      "kind": "original_render_preview",
+      "width": 720,
+      "height": 900,
+      "metadata_stripped": true,
+      "sha256": "a612a66138e2d438feb3e0558ea9c96f740bff2c02f562be23dbcb0dc06ab86c"
+    },
+    {
+      "file": "optical-module.png",
+      "origin": "已有原创光模块结构渲染预览",
+      "kind": "original_render_preview",
+      "width": 540,
+      "height": 960,
+      "metadata_stripped": true,
+      "sha256": "8ca1888dc38543fcd72da242d476c80ba526c03d572877d8f2c292cfe5ec76b2"
+    }
+  ]
+}

@@ -4,7 +4,7 @@
     1080,
     1920
   ],
-  "basis": "2026-10-04用户反馈底部字幕被遮挡；本配置是保守制作预留，不是平台官方固定像素规范。实际设备遮罩必须另留证据。",
+  "basis": "为字幕、卡片与平台UI预留空间；本配置是保守制作预留，不是平台官方固定像素规范。实际设备遮罩必须另留证据。",
   "real_device_calibrated": false,
   "critical_bounds": [
     64,
@@ -72,7 +72,7 @@
   ],
   "decorative_exceptions": [
     {
-      "id": "brand_zenith",
+      "id": "brand_wordmark",
       "bounds": [
         400,
         60,

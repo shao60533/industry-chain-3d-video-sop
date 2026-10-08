@@ -11,3 +11,24 @@ __pycache__/
 *.mp3
 *.mp4
 *.blend
+
+# Local agents, accounts and production state
+.codex/
+.claude/
+.dsh/
+.mimosa/
+.video_agent/
+logs/
+accounts/
+sessions/
+voice-references/
+recordings/
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
+*.log
+*.bak

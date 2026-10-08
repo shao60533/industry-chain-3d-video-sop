@@ -1,10 +1,12 @@
-# 下一集启动包
+# Codex 下一集启动包
 
-2026-10-04。制作准备模板已完成，选题与指定完整来源尚未填；不是已启动的一期视频，也没有发布授权。既有光/存储成片保持原状。
+2026-10-04。制作准备模板已完成，选题与指定完整来源尚未填；不是已启动的一期视频，也没有发布授权。既有任务与历史产物保持原状。
 
-现行[制作SOP](../../docs/production-sop.md)、[发布SOP](../../docs/publication-sop.md)、复盘（内部案例未分发）。
+现行[制作SOP](../../docs/production-sop.md)、[发布SOP](../../docs/publication-sop.md)、复盘。
 
-2026-10-07：先读[用户纠正执行卡](../../docs/review-checklist.md)，复制user-corrections-checklist.template.json作为工作底稿。每项留实际观察、产物及未验范围，汇入原12项报告；不新增自动通过，也不修改已确认旧稿。共同错误按全期受影响项返工。
+2026-10-07：先读[制作复核执行卡](../../docs/review-checklist.md)，复制user-corrections-checklist.template.json作为工作底稿。每项留实际观察、产物及未验范围，汇入原12项报告；不新增自动通过，也不修改已确认旧稿。共同错误按全期受影响项返工。
+
+先填写 [Codex 本期任务契约](codex-brief.template.md)，然后按以下步骤执行。
 
 1. 复制模板到新的job目录，填写topic/product、完整来源URL/版本/哈希、集数和约5分钟预算。不要运行旧v24或光互连固定帧脚本。
 2. script.template.md只提供段落骨架。先写一层完整观点，用company-judgments表检查用途、门槛、具体卡点、公司竞争位置、证据和赚钱机制，再完成整稿。
@@ -14,15 +16,15 @@
 6. opening-cues按帧号做独立9.5秒无口播样片：真实展开、短悬停环绕、真实合体，节奏音乐带动展开/环绕/合体，轻音效跟动作落点，接第一句本人旁白。BPM按本期选，不照搬120；当前cue是设计，尚未渲染/实听。
 7. 样片含两行长字幕、财务卡、问答、部件图注和结构动作。先锁safe-layout.template.json及字体SHA测bounds，360/390宽带遮罩和实际界面验收，再长渲染；子模块有参考和成片可见近景。
 8. 全片导出layout.jsonl，绑定当前视频/profile SHA填acceptance.template.json的12项证据。缺项pending；可交本地审阅包，release_ready=true才冻结发布包。
-9. H manifest含production_acceptance，用video_publish_preflight.py退出0后才启动原publisher；原授权/话题/群/封面/AI/定时/单次attempt不省。
+9. H manifest含production_acceptance，由Codex调用自行配置的质量预检通过后再启动平台适配器；原授权/话题/群/封面/AI/定时/单次attempt不省。
 
 同源导出/校验命令（仅在具体稿件完成后使用，替换绝对路径占位符）：
 
 > 原内部命令未随本仓库分发。工具对接要求见工具适配说明；不可将这里的流程当作已安装的一键命令。
 
-上述工具已用一致导出、旧TXT、源稿改变三种行为验证。不是通用video run，不会发布、配音或覆盖历史任务。
+对接导出工具时，需验证一致导出、旧TXT和源稿改变三种情况。不是通用video run，不会发布、配音或覆盖历史任务。
 
-共用[验收规则](../../docs/acceptance.md)及三期复盘（内部案例未分发）。不复制旧y1662、过期验收SHA或仅文件存在的缓存规则。
+共用[验收规则](../../docs/acceptance.md)。不复制旧y1662、过期验收SHA或仅文件存在的缓存规则。
 
 2.2：先填写production-spec所有实际内容与焦点窗口，生成全部requirements，再分别真实完成check-report（不得复制测试fixture）；acceptance仅引用逐项报告。H按质量优先launcher，只读check-only先验；缺UI/实听即审阅包，不冻结为发布就绪。
 

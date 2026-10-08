@@ -1,8 +1,10 @@
-# 小红书视频发布与 DSH 复用 SOP
+# Codex 视频发布 SOP · 小红书适配
 
-版本 xhs-video-2.2，2026-10-04。此文件是现行视频发布入口；旧版已保存至复盘 backups/sop。制作见[视频制作SOP](production-sop.md)。历史提交授权只覆盖原片，SOP更新不新增发布权限。
+> 本文规定 Codex 和适配器应执行的行为。文中的原内部程序/插件名称未随仓库分发，接入责任见[工具适配说明](tool-adapters.md)。
 
-2026-10-07用户纠正复盘：[执行卡](review-checklist.md)。封面可独立制作；原帖封面更新按下节单独归档，不把重新上传视频或新发一篇当作更新。
+版本 xhs-video-2.2，2026-10-04。此文件是现行视频发布入口。制作见[视频制作SOP](production-sop.md)。历史提交授权只覆盖原片，SOP更新不新增发布权限。
+
+2026-10-07制作复核补充：[执行卡](review-checklist.md)。封面可独立制作；原帖封面更新按下节单独归档，不把重新上传视频或新发一篇当作更新。
 
 ## 原帖仅更新封面
 
@@ -34,7 +36,7 @@
 
 ## 3. 标准步骤
 
-1. 先运行video-acceptance/video_publish_preflight.py --manifest <本期H manifest> --out <production-preflight.json>，非零退出立即停止，不启动DSH、不触碰web/bridge。通过后核有效授权、当前包、账号、锁和工具能力。其他publisher持锁等待或返回busy；拿到锁再设置时间，不提前计算导致排队消耗提前量。
+1. 先执行自行配置的质量预检（原接口名 video_publish_preflight.py，见[工具适配说明](tool-adapters.md)），非零退出立即停止，不启动发布适配器、不触碰网页。通过后核有效授权、当前包、账号、锁和工具能力。其他publisher持锁等待或返回busy；拿到锁再设置时间，不提前计算导致排队消耗提前量。
 2. 后台精确完整标题查重，核ready与found。只有ready=true且found=false可初建；超时/未知不能解释为不存在。已有attempt/result只读回查。
 3. prepare一次，持久保存content_key、draftId、tabId、fingerprint与manifest SHA。后续只在唯一原稿继续，不刷新未提交稿、不新建、不重上传。跨轮需要保留浏览器页时标记handoff，不把未提交页当临时研究页清理。
 4. 区分文件票据交付、传输、转码、可播放。懒加载记录真实video的readyState/duration/error和原稿身份，再有限复读；状态变化或诊断介入有依据才恢复，不能拿另一video节点或exit0证明就绪。只接受真实时长、可播放且无错误/处理中；100%或“重新上传”按钮存在都不能替代此判断。当前平台限制现场读取，本地适配器限制另行记录，不照搬旧HANDOFF。
@@ -67,7 +69,7 @@
 
 - 同一明确错误最多一次定点重试，失败回到工具根因；新会话只带短恢复契约。桥接缓存按相同tab的最新lastSeen选择，不能让helper页或旧token抢路由；后台body ready而非整页无关网络完成作读取条件。
 - 在途封面标记先于File赋值；同SHA在途不重复交付。状态持久化及回读成功后才能推进applied，弹窗未关一律阻断。
-- 已有attempt无通用续点/重发规则。存储上集MAIN变量作用域故障仅在固定源码、同指纹无页面marker、后台无匹配共同证明后完成同attempt的首次实际点击；这是已知事件例外，不能用于其他timeout。
+- 已有attempt无通用续点/重发规则。提交结果未知时只能只读核验；修复工具后仍保留原 attempt 与 unknown 证据，不把无匹配误判为从未提交。
 - 原标签关闭且原提交未知：只读查后台，保留unknown。无法恢复不自行重建；只有用户明确要求重新发布时，建立独立恢复包、记录新增授权、保留原未知历史，重新查重并单次提交。不能把新稿成功推成原稿没点过。
 - 扩展管理页被浏览器策略拒绝时由用户重载现有扩展，不绕过；与发布授权不同，无需重问已有发布许可。
 - 归档失败不重发。最新两集包、active registry、原unknown与恢复证据进入本地队列；NAS连通/实际传输证据取得前只写queued。
@@ -78,6 +80,6 @@
 
 ## 2026-10-04 质量前置2.2
 
-H manifest增加revision_id与production_acceptance，绑定2.2 spec及12项独立类型报告；最终封面/标题/正文亦同版。video_publisher_run.py --check-only可只读验收；非零不启动publisher。实际xhs_video_prepare在浏览器前、创建prepare记录/上传票据前双查；xhs_video_publish在verify前、claim attempt前双查固定本地checker，缺证据不写页、不生成attempt。不提供关闭开关，不复用旧全局passed。status/focus保留旧包只读恢复，未知/已有attempt不重发。
+H manifest增加revision_id与production_acceptance，绑定2.2 spec及12项独立类型报告；最终封面/标题/正文亦同版。适配器应支持只读预检（原接口 video_publisher_run.py --check-only）；非零不启动publisher。prepare 应在浏览器前、创建prepare记录/上传票据前双查；publish 应在verify前、claim attempt前双查固定本地checker，缺证据不写页、不生成attempt。不提供关闭开关，不复用旧全局passed。status/focus保留旧包只读恢复，未知/已有attempt不重发。
 
-制作质量通过不授予发布权，账号/话题chip/群/封面/AI/时间/单次提交原门禁全部保留。本轮只完成离线阻断和本地媒体等价检查，真实新包授权全链仍待验证；不拿已发布三期补测。详情见视频video-acceptance/验收规则.md。
+制作质量通过不授予发布权，账号/话题chip/群/封面/AI/时间/单次提交原门禁全部保留。由 Codex 在当前环境验证质量前置、草稿和授权提交路径，详见[验收规则](acceptance.md)。

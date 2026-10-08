@@ -1,55 +1,127 @@
-# 产业链 3D 视频制作 SOP
+![Codex 产业链 3D 视频制作 SOP](assets/hero.png)
 
-从完整产业研究稿出发，把产品拆成可解释、可编辑、可验证的 3D 视频：讲清每层的用途、技术瓶颈、公司竞争位置和赚钱机制。
+# Codex · 产业链 3D 视频制作 SOP
 
-这是中文 SOP、质量标准和任务模板仓库。包含完整 A–H 工作流及 video-2.2 验收契约，整合截至 2026-10-07 的制作修订。开源整理日期：2026-10-08。
+**让 Codex 把完整产业研究稿，变成讲得明白、拆得清楚、可编辑的 3D 视频。**
 
-## 从这里开始
+从产品用途出发，沿结构与工艺拆到技术瓶颈、公司竞争和赚钱机制。Codex 贯穿读源、写稿、分镜、建模脚本、配音与渲染调度、问题修复、质量证据和交付。
 
-1. 阅读 [制作 SOP](docs/production-sop.md)，确定选题、完整来源、产品范围及单集时长。
-2. 复制 [下一集启动模板](templates/next-episode/README.md) 到自己的工作目录，填写来源、稿件、模型、音色、字体和验收信息。
-3. 先完成稿件、30–60 秒配音试听、整体/展开/内部参考图、8–10 秒开场以及 15–30 秒难例样片，再投入全片渲染。
-4. 按 [验收规则](docs/acceptance.md) 完成最终文件的真实证据，冻结视频、封面、字幕与发布文案。
-5. 需要发布时，按 [发布 SOP](docs/publication-sop.md) 配置平台适配器、核实账号与授权、单次提交并保存原始回执。
+<p align="center"><strong>Codex 主导</strong> · 产品真实拆解 · 先样片后全片 · 12 项质量证据 · MIT 开源</p>
 
-模板中的 null、false、pending 和空数组是待填内容，不代表完成。复制模板不会启动制作或发布。
+[快速开始](#快速开始) · [Codex 工作流](docs/codex-workflow.md) · [完整制作 SOP](docs/production-sop.md) · [视觉示例](#视觉示例) · [任务模板](templates/next-episode/README.md) · [隐私检查](docs/publication-review.md)
 
-## 完整工作流
+## 你会得到什么
 
-| 阶段 | 工作 | 核心交付 |
+| 从哪里出发 | 怎样制作 | 怎样交付 |
 |---|---|---|
-| A | 完整读源、选择范围 | 原文快照、版本/SHA、brief、来源映射 |
-| B | 改编为有具体判断的口播 | MD/TXT/JSON、公司判断表、稿件锁 |
-| C | 参考图、设计、分镜 | 整体/展开/内部图、设计锁、镜头与音乐 cue |
-| D | 配音与对齐 | 获授权音色试听、WAV、timing、SRT |
-| E | 分件建模与样片 | 可编辑工程、语义对象、真实展开/环绕/合体 |
-| F | 全片制作与核验 | MP4、全帧布局、连续听看、实际设备证据 |
-| G | 质量冻结 | 12 项报告、production-spec、资产 manifest |
-| H | 发布与归档 | 唯一草稿、单次 attempt、回执、状态台账 |
+| 指定完整原文、产品范围与来源证据 | Codex 规划、实现并调度专业工具 | 可编辑工程、成片和对应质量证据 |
+| 每层有明确用途、瓶颈和公司判断 | 真实分件展开、短环绕、合体和功能近景 | 同源稿件、音轨、字幕、封面及发布包 |
+| 自有品牌与获授权音色 | 先试听与难例样片，再投入长渲染 | 实际未验范围、修改依赖和可恢复记录 |
 
-开头以节奏音乐推动真实分层展开和合体；正文进入功能近景，再揭晓公司。封面允许独立设计或生成，正文图、模型和原生动作保持对应。关键字幕透明背景、最多两行，实际字形与部件焦点避开卡片和平台 UI。
+仓库提供中文 SOP、空白模板、布局配置和展示图片。原内部自动化程序与发布插件未分发；工具对接责任见[适配说明](docs/tool-adapters.md)。
 
-## 文档与模板
+## 快速开始
 
-- [制作 SOP](docs/production-sop.md)：研究、写稿、开场、配音、建模、渲染、恢复与交接。
-- [质量验收](docs/acceptance.md)：Q-A 至 Q-E 五关、12 项证据、哈希绑定与修改后重验。
-- [视觉质量](docs/visual-quality.md)：产品完成度、材料、封面层级、近景和同宽比较。
-- [审稿与看图清单](docs/review-checklist.md)：产品分类、观点、全链、问答与共性问题返工。
-- [组件阶段契约](docs/component-scope-contract.md)：产品内件与上游材料、设备、外部系统的覆盖边界。
-- [发布 SOP](docs/publication-sop.md)：冻结包、唯一草稿、话题、封面、定时、回执及未知提交恢复。
-- [单阶段交接模板](docs/handoff.md)：当前阶段输入、输出、授权、质量状态和恢复条件。
-- [工具适配说明](docs/tool-adapters.md)：所需工具、日志及原内部入口的对应责任。
-- [下一集模板](templates/next-episode/README.md)：任务、稿件、公司判断、开场 cue、组件清单、生产 spec、报告与复核底稿。
-- [安全布局 profile](profiles/safe-layout.default.json)：1080×1920 保守布局起点，需核实际字体和当前平台界面。
+1. 打开 [Codex 工作流](docs/codex-workflow.md)，复制其中的启动任务，填入自己的产品、完整来源、品牌、工作目录与实际工具。
+2. 把 [下一集模板](templates/next-episode/README.md) 复制到本地 `jobs/<job-id>/`。默认 `produce_only`，账号、音色、来源与所有验收结果等待实际填写。
+3. 让 Codex 先读完整来源、写一层完整判断和全期结构，再制作配音试听、三类产品图、开场与正文难例样片。
+4. 样片达到要求后进入全片；按 [质量验收](docs/acceptance.md) 检查最终编码、声音、运动、布局和真实设备。
+5. 需要发布时按 [发布 SOP](docs/publication-sop.md) 核冻结资产、账号和实际授权，再通过自行验证的适配器单次提交。
 
-## 所需工具与当前范围
+> **模板不是成片，也不是通过证明。** `null / false / pending` 表示待填或待验。Codex 自检如实记录为 `self_review`；实听、连续播放和设备检查以实际能力与证据为准。
 
-建议准备可编辑 3D 建模/动画工具（如 Blender）、视频合成工具、FFmpeg/ffprobe、配音与强制对齐工具，以及实际播放设备。所有工具由使用者自行安装、配置并验证。
+## Codex 怎样贯穿流程
 
-本仓库分发流程文档、JSON 模板与布局配置，不包含内部制作运行器、验收 Python 程序、浏览器发布插件、项目模型、成片、个人音色、付费原稿或账号配置。文档中的 script_bundle.py、video_acceptance.py、video_publish_preflight.py、video_publisher_run.py 和 xhs_video_* 是原系统接口名称；它们的职责见工具适配说明，不是本仓库提供的命令。历史内部运行结果也不能证明读者环境的能力。
+```mermaid
+flowchart LR
+    S[完整来源与任务范围] --> C[Codex 主执行者]
+    C --> P[稿件 · 判断 · 分镜]
+    C --> T[建模 · 配音 · 合成工具]
+    P --> V[试听与难例样片]
+    T --> V
+    V --> F[全片与实际证据]
+    F --> Q{质量复核}
+    Q -->|需要返工| C
+    Q -->|通过| G[冻结与交付]
+    G --> H[授权范围内发布]
+    style C fill:#123848,stroke:#5bd6df,color:#fff
+    style Q fill:#3c3020,stroke:#dfba79,color:#fff
+```
 
-使用自己的完整来源和品牌问候，保留可回溯证据。单集约 5 分钟、1080×1920/24fps 为制作起点；语速、BPM、拆集和平台参数按实际任务决定。质量待验可以交付本地审阅包；发布就绪需要真实完成对应检查。
+专业工具负责具体计算和操作，Codex 维护任务与依赖，实际复核者确认声音、动态与设备效果。可选模型用于明确分配的子任务。默认分工、提示词和目录约定见 [AGENTS.md](AGENTS.md) 与 [Codex 工作流](docs/codex-workflow.md)。
+
+## 视觉示例
+
+这些是从已有原创素材中选出的纯渲染预览。它们展示分层结构、近景与材料组织，作为方法示例；每期仍需核自己的产品依据和成片质量。
+
+<table>
+<tr>
+<td align="center"><img src="assets/semiconductor-exploded.png" height="340" alt="芯片封装分层渲染示意"><br><strong>分层展开</strong><br>盖板、裸片、基板与焊球的空间关系</td>
+<td align="center"><img src="assets/substrate-detail.png" height="340" alt="基板焊盘、布线与器件近景"><br><strong>进入功能细节</strong><br>焊盘、器件、布线与连接落点</td>
+</tr>
+<tr>
+<td align="center"><img src="assets/optical-module.png" height="340" alt="光模块外壳与内部结构渲染示意"><br><strong>材料与装配</strong><br>外壳让开，内部结构成为观察入口</td>
+<td align="center"><img src="assets/robot-joint.png" height="340" alt="机器人肩臂关节内部渲染示意"><br><strong>功能近景</strong><br>驱动、承力、紧固与接口的可见关系</td>
+</tr>
+</table>
+
+封面是新生成的概念插图；上述产品图为通用建模示意，不能用来声明厂商 CAD、实际工艺剖面或真实供应关系。素材来源类别、尺寸、许可与处理方式见 [素材说明](assets/README.md) 和 [图解方法](docs/visual-examples.md)。
+
+## 一期视频的 A–H 工作流
+
+| 阶段 | Codex 推进的工作 | 核心产物 |
+|---|---|---|
+| **A · 来源** | 完整读源、锁版本、判断范围与缺口 | 原文快照、SHA、brief、来源映射 |
+| **B · 稿件** | 用途→门槛→瓶颈→公司竞争→盈利，问答成对 | MD/TXT/JSON、公司判断、稿件锁 |
+| **C · 设计** | 产品参考、三类图、分镜、封面和音乐 cue | 设计锁、shot-map、布局与字体锁 |
+| **D · 音轨** | 调度获授权音色，试听、配音和重对齐 | WAV、voice-lock、timing、SRT |
+| **E · 模型** | 原生分件、语义节点、连续展开/环绕/合体 | 可编辑工程、开场和正文难例 |
+| **F · 全片** | 渲染、合成、编码、逐帧日志与实际复核 | MP4、layout、技术与听看证据 |
+| **G · 冻结** | 核12项报告及全依赖，记录真实交付状态 | production-spec、报告、资产 manifest |
+| **H · 发布** | 核授权与账号、唯一草稿、单次提交与归档 | attempt/result、原始回执和状态台账 |
+
+### 先把最难的 30 秒做好
+
+- **配音试听：** 30–60 秒，包含公司名、数字、缩写和判断句。
+- **开场：** 8–10 秒，节奏音乐推动真实展开、短环绕与合体，音效点缀落点。
+- **正文难例：** 15–30 秒，同时检验功能动作、两行字幕、数据卡和图注。
+- **观看尺寸：** 200/390px 对照产品焦点，360/390px 检查编码遮罩，真实设备另验。
+
+封面可独立设计或生成；正文图、模型和动作保持对应。字幕透明背景、最多两行；关键字形、数字和正在解释的部件避开卡片及平台 UI。语速、BPM、拆集和时长按当前实际样片决定。
+
+## 五道质量关口
+
+```mermaid
+flowchart LR
+    A[Q-A 稿件与来源] --> B[Q-B 设计与难例]
+    B --> C[Q-C 机器成片]
+    C --> D[Q-D 感知与设备]
+    D --> E[Q-E 冻结与提交]
+    style A fill:#123848,stroke:#5bd6df,color:#fff
+    style E fill:#123848,stroke:#5bd6df,color:#fff
+```
+
+技术通过、布局通过、发布就绪、已提交、审核中和已公开分别记录。12 项证据绑定当前文件 SHA；缺项或 `pending` 时交本地待验审阅包。改稿、音轨、字体、模型、封面或编码，按依赖决定重验范围。
+
+## 文档导航
+
+| 想完成的事 | 文档 |
+|---|---|
+| 让 Codex 开始执行 | [Codex 工作流与启动任务](docs/codex-workflow.md) |
+| 从原稿做完整 3D 视频 | [制作 SOP](docs/production-sop.md) |
+| 确定封面、模型和近景品质 | [视觉质量基准](docs/visual-quality.md) · [图解示例](docs/visual-examples.md) |
+| 检查逻辑、具体观点和全链覆盖 | [制作复核执行卡](docs/review-checklist.md) |
+| 对齐组件、阶段和证据 | [组件契约](docs/component-scope-contract.md) · [质量验收](docs/acceptance.md) |
+| 配置工具与平台发布 | [工具适配](docs/tool-adapters.md) · [发布 SOP](docs/publication-sop.md) |
+| 交接当前阶段或启动下一集 | [交接契约](docs/handoff.md) · [空白模板](templates/next-episode/README.md) |
+| 保护个人信息与凭证 | [隐私规则](SECURITY.md) · [公开前审查](docs/publication-review.md) |
+
+## 工具与配置
+
+准备可编辑 3D 工具（如 Blender）、配音与对齐工具、视频合成工具、FFmpeg/ffprobe 以及实际播放设备。Codex 在当前环境中实现或对接工具；原内部接口名仅用于说明职责，不能作为本仓库已提供的命令。
+
+默认制作起点为 1080×1920、24fps、约5分钟单集。使用自己的完整来源、品牌、账号和获授权音色。`jobs/`、个人音频、凭证、平台日志和原始后台回执保存在本地忽略目录。展示图已重新编码清除元数据，并检查可见内容。
 
 ## 开源与贡献
 
-文档、模板与配置采用 [MIT License](LICENSE)。项目许可不授予第三方图片、原稿、音乐、音色或品牌的使用权。贡献方法见 [CONTRIBUTING](CONTRIBUTING.md)，整理范围见 [版本记录](CHANGELOG.md)。
+文档、模板、配置及本仓库展示素材采用 [MIT License](LICENSE)。第三方来源、品牌、音乐和音色的使用权另行确认。贡献方法见 [CONTRIBUTING](CONTRIBUTING.md)，版本变化见 [CHANGELOG](CHANGELOG.md)。

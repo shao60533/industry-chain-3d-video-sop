@@ -59,7 +59,7 @@
         "source_script",
         "voice_identity"
       ],
-      "criterion": "Zenith完整来源先取数据，内部口径、MD/TXT/JSON一致；本人实测估时与预算",
+      "criterion": "指定完整来源先取数据，内部口径、MD/TXT/JSON一致；本人实测估时与预算",
       "status": "pending",
       "actual_observation": null,
       "evidence_artifacts": [],
