@@ -13,6 +13,7 @@ import subprocess
 ROOT = Path(__file__).resolve().parent.parent
 SKILL_NAME = "industry-chain-3d-video"
 PILLOW_VERSION = "12.3.0"
+BLENDER_STARTUP_TIMEOUT = 120
 
 
 def safe_message(value: str) -> str:

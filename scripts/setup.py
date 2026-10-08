@@ -16,7 +16,7 @@ import tempfile
 import venv
 import zipfile
 
-from runtime import PILLOW_VERSION, ROOT, SKILL_NAME, find_tool, python_in, run, safe_message, version
+from runtime import BLENDER_STARTUP_TIMEOUT, PILLOW_VERSION, ROOT, SKILL_NAME, find_tool, python_in, run, safe_message, version
 
 PAYLOAD = ("SKILL.md", "agents", "docs", "profiles", "templates", "scripts", "tests", "assets",
            "requirements.txt", "LICENSE", "README.md", "AGENTS.md", "SECURITY.md",
@@ -215,7 +215,7 @@ def install(destination: Path, skip_system: bool, smoke: bool) -> dict:
     missing = []
     for name in ("blender", "ffmpeg", "ffprobe"):
         path = find_tool(name, saved.get("tools", {}))
-        if path and (name != "blender" or version(run([path, "--version"], timeout=30)) >= (3, 6, 0)):
+        if path and (name != "blender" or version(run([path, "--version"], timeout=BLENDER_STARTUP_TIMEOUT)) >= (3, 6, 0)):
             tools[name] = path
         else:
             missing.append(name)
@@ -270,7 +270,7 @@ def install(destination: Path, skip_system: bool, smoke: bool) -> dict:
     report_file = local / "doctor.json"
     report_file.unlink(missing_ok=True)
     try:
-        result = json.loads(run(args, timeout=360))
+        result = json.loads(run(args, timeout=600))
     except RuntimeError:
         if report_file.is_file():
             failed = json.loads(report_file.read_text(encoding="utf-8"))

@@ -9,7 +9,7 @@ import platform
 import sys
 import tempfile
 
-from runtime import ROOT, config, find_tool, run, safe_message, version
+from runtime import BLENDER_STARTUP_TIMEOUT, ROOT, config, find_tool, run, safe_message, version
 
 BLENDER_SMOKE = '''import bpy, sys
 from pathlib import Path
@@ -77,7 +77,8 @@ def inspect_environment(smoke: bool = False) -> dict:
             path = find_tool(name, saved.get("tools", {}))
             if path is None:
                 raise RuntimeError(f"缺少 {name}")
-            output = run([path, "--version" if name == "blender" else "-version"], timeout=30)
+            timeout = BLENDER_STARTUP_TIMEOUT if name == "blender" else 30
+            output = run([path, "--version" if name == "blender" else "-version"], timeout=timeout)
             parsed = version(output)
             if name == "blender" and parsed < (3, 6, 0):
                 raise RuntimeError("Blender 需要 3.6 或更新版本，建议维护中的 LTS")
