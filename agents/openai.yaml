@@ -1,0 +1,7 @@
+interface:
+  display_name: "产业链 3D 视频"
+  short_description: "用 Codex 完成产业链读源、分件建模、动效与质量交付，附依赖安装和环境自检"
+  brand_color: "#5BD6DF"
+  default_prompt: "使用 $industry-chain-3d-video 检查制作环境，并按完整来源制作本期产业链 3D 视频的稿件与样片。"
+policy:
+  allow_implicit_invocation: true

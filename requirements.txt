@@ -1,0 +1,2 @@
+# Isolated in the installed skill's .venv; Blender has its own Python.
+Pillow==12.3.0

@@ -32,3 +32,10 @@ recordings/
 *.db
 *.log
 *.bak
+
+# Installer-generated local state and isolated Python dependencies
+.venv/
+.local/
+.skill-installation.json
+local-skill/
+*.part

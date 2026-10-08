@@ -8,7 +8,7 @@
 
 <p align="center"><strong>Codex 主导</strong> · 产品真实拆解 · 先样片后全片 · 12 项质量证据 · MIT 开源</p>
 
-[快速开始](#快速开始) · [Codex 工作流](docs/codex-workflow.md) · [完整制作 SOP](docs/production-sop.md) · [视觉示例](#视觉示例) · [任务模板](templates/next-episode/README.md) · [隐私检查](docs/publication-review.md)
+[一键安装](#一键安装到-codex) · [快速开始](#快速开始) · [Codex 工作流](docs/codex-workflow.md) · [完整制作 SOP](docs/production-sop.md) · [视觉示例](#视觉示例) · [任务模板](templates/next-episode/README.md) · [隐私检查](docs/publication-review.md)
 
 ## 你会得到什么
 
@@ -18,7 +18,23 @@
 | 每层有明确用途、瓶颈和公司判断 | 真实分件展开、短环绕、合体和功能近景 | 同源稿件、音轨、字幕、封面及发布包 |
 | 自有品牌与获授权音色 | 先试听与难例样片，再投入长渲染 | 实际未验范围、修改依赖和可恢复记录 |
 
-仓库提供中文 SOP、空白模板、布局配置和展示图片。原内部自动化程序与发布插件未分发；工具对接责任见[适配说明](docs/tool-adapters.md)。
+仓库提供可安装的 Codex 技能、依赖安装器、环境自检、任务初始化工具，以及中文 SOP、模板、布局和示意素材。复杂制作运行器与平台发布插件仍需按[适配说明](docs/tool-adapters.md)接入。
+
+## 一键安装到 Codex
+
+**把下面这句发给 Codex 即可：**
+
+```text
+请把 https://github.com/shao60533/industry-chain-3d-video-sop 安装为 industry-chain-3d-video 技能，使用统一安装器准备 Blender、FFmpeg、独立 Python 环境和中文字体，并完成实际渲染/编码自检。
+```
+
+也可在 macOS/Linux 终端执行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/shao60533/industry-chain-3d-video-sop/main/install.sh | bash
+```
+
+安装器复用已有工具，自动补齐缺失依赖；不会索取 token、上传音色或配置平台账号。Windows PowerShell、离线工具配置、版本选择与权限说明见 [完整安装指南](docs/installation.md)。安装后在下一个 Codex 回合使用 **`$industry-chain-3d-video`**。
 
 ## 快速开始
 
@@ -107,6 +123,7 @@ flowchart LR
 
 | 想完成的事 | 文档 |
 |---|---|
+| 安装技能与依赖 | [一键安装指南](docs/installation.md) · [技能入口](SKILL.md) |
 | 让 Codex 开始执行 | [Codex 工作流与启动任务](docs/codex-workflow.md) |
 | 从原稿做完整 3D 视频 | [制作 SOP](docs/production-sop.md) |
 | 确定封面、模型和近景品质 | [视觉质量基准](docs/visual-quality.md) · [图解示例](docs/visual-examples.md) |
