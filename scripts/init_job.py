@@ -20,6 +20,8 @@ def initialize(output: Path) -> None:
     if output.exists() or output.is_symlink():
         raise ValueError("任务目录已存在；请使用新目录，原产物不会被覆盖")
     output.parent.mkdir(parents=True, exist_ok=True)
+    # Resolve directory aliases before calculating links (macOS /var is a symlink).
+    output = output.parent.resolve() / output.name
     with tempfile.TemporaryDirectory(prefix=".video-job-", dir=output.parent) as temporary:
         stage = Path(temporary) / "job"
         shutil.copytree(ROOT / "templates/next-episode", stage / "templates")

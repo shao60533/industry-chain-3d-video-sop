@@ -39,7 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/shao60533/industry-chain-3d-video-s
 ## 快速开始
 
 1. 打开 [Codex 工作流](docs/codex-workflow.md)，复制其中的启动任务，填入自己的产品、完整来源、品牌、工作目录与实际工具。
-2. 把 [下一集模板](templates/next-episode/README.md) 复制到本地 `jobs/<job-id>/`。默认 `produce_only`，账号、音色、来源与所有验收结果等待实际填写。
+2. 让 Codex 用任务初始化工具建立新的本地 `jobs/<job-id>/`，其中保存[下一集模板](templates/next-episode/README.md)。默认 `produce_only`，账号、音色、来源与所有验收结果等待实际填写。
 3. 让 Codex 先读完整来源、写一层完整判断和全期结构，再制作配音试听、三类产品图、开场与正文难例样片。
 4. 样片达到要求后进入全片；按 [质量验收](docs/acceptance.md) 检查最终编码、声音、运动、布局和真实设备。
 5. 需要发布时按 [发布 SOP](docs/publication-sop.md) 核冻结资产、账号和实际授权，再通过自行验证的适配器单次提交。

@@ -9,7 +9,7 @@ Codex 是主执行者，专业工具按实际环境执行。保留用户指定�
 
 ## 首次安装或依赖问题
 
-在本技能目录运行 `python3 scripts/setup.py`（Windows 可用 `py -3`），安装缺失依赖、隔离 Python 环境及字体。脚本默认安装到 `${CODEX_HOME:-~/.codex}/skills/industry-chain-3d-video`。当已通过技能安装器下载到该目录时，直接原地配置。
+在本技能目录运行 `bash install.sh`（macOS/Linux）或 `./install.ps1`（Windows），复用已有工具并安装缺失的 Python、Blender、FFmpeg、隔离 Python 环境及字体。已有 Python 3.11+ 时也可运行 `python3 scripts/setup.py`。默认安装到 `${CODEX_HOME:-~/.codex}/skills/industry-chain-3d-video`；已下载到该目录时直接原地配置。
 
 安装后使用 `.venv/bin/python scripts/doctor.py --smoke-test`；Windows 使用 `.venv\Scripts\python.exe`。本机工具绝对路径仅保存在 `.local/environment.json`，不写入公开文件。缺失依赖或测试失败不能宣布环境就绪；具体支持、权限与离线配置见 [安装指南](docs/installation.md)。
 
