@@ -1,0 +1,85 @@
+{
+  "id": "xhs-conservative-1080x1920-v2",
+  "canvas": [
+    1080,
+    1920
+  ],
+  "basis": "2026-10-04用户反馈底部字幕被遮挡；本配置是保守制作预留，不是平台官方固定像素规范。实际设备遮罩必须另留证据。",
+  "real_device_calibrated": false,
+  "critical_bounds": [
+    64,
+    100,
+    880,
+    1540
+  ],
+  "masks": [
+    {
+      "id": "top",
+      "rect": [
+        0,
+        0,
+        1080,
+        100
+      ]
+    },
+    {
+      "id": "bottom",
+      "rect": [
+        0,
+        1560,
+        1080,
+        1920
+      ]
+    },
+    {
+      "id": "right",
+      "rect": [
+        900,
+        460,
+        1080,
+        1560
+      ]
+    }
+  ],
+  "caption_panel": [
+    64,
+    1388,
+    880,
+    1532
+  ],
+  "card_bounds": [
+    64,
+    980,
+    880,
+    1350
+  ],
+  "caption_min_font_size": 42,
+  "caption_max_lines": 2,
+  "card_caption_gap": 24,
+  "review_phone_widths": [
+    360,
+    390
+  ],
+  "required_review_cases": [
+    "opening",
+    "one_line",
+    "two_lines",
+    "questions",
+    "answers",
+    "finance",
+    "all_chapters",
+    "transitions"
+  ],
+  "decorative_exceptions": [
+    {
+      "id": "brand_zenith",
+      "bounds": [
+        400,
+        60,
+        560,
+        105
+      ],
+      "reason": "非关键信息字标；不豁免标题、字幕、数字或功能焦点"
+    }
+  ]
+}

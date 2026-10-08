@@ -1,0 +1,15 @@
+{
+  "schema": "video-component-inventory-1",
+  "job_id": null,
+  "revision_id": null,
+  "source_script_sha256": null,
+  "film_plan": {
+    "path": null,
+    "sha256": null
+  },
+  "opening_assembly": {
+    "path": "opening-assembly.json",
+    "sha256": null
+  },
+  "components": []
+}

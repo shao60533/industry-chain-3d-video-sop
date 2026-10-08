@@ -1,0 +1,65 @@
+{
+  "schema": "zenith-video-job-template/2.2",
+  "job_id": null,
+  "topic": null,
+  "product": null,
+  "source": {
+    "url": null,
+    "version": null,
+    "sha256": null,
+    "data_as_of": null
+  },
+  "mode": "produce_only",
+  "publication_authorization": null,
+  "platform": "xiaohongshu",
+  "expected_account": null,
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 24
+  },
+  "duration_budget_seconds": 300,
+  "parts": null,
+  "voice_preferences": null,
+  "voice_lock": {
+    "identity": "owner",
+    "reference_audio": null,
+    "reference_audio_sha256": null,
+    "reference_transcript": null,
+    "reference_transcript_sha256": null,
+    "speed": null,
+    "preview_accepted": false
+  },
+  "opening_candidate": {
+    "total_frames": 228,
+    "sfx_cues": "opening-cues.template.json",
+    "demo_accepted": false,
+    "audio_direction": "有旋律/低音/鼓点推进的音乐，音效点缀"
+  },
+  "ready_to_produce": false,
+  "missing": [
+    "topic",
+    "designated_source",
+    "part_plan",
+    "approved_script",
+    "voice_preview",
+    "opening_demo",
+    "masked_phone_sample",
+    "actual_device_overlay_evidence",
+    "final_media_acceptance"
+  ],
+  "safe_layout": "C-design/safe-layout.json",
+  "font_lock": {
+    "path": null,
+    "sha256": null
+  },
+  "acceptance": {
+    "schema": "video-release-evidence-2.2",
+    "evidence": "G-package/acceptance.json",
+    "layout": "F-film/layout.jsonl",
+    "release_ready": false,
+    "spec": "G-package/production-spec.json",
+    "report_template": "check-report.template.json"
+  },
+  "revision_id": null
+}

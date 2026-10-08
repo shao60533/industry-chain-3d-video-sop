@@ -1,0 +1,111 @@
+{
+  "schema": "zenith-visual-review-1.1",
+  "status": "pending",
+  "job_id": null,
+  "revision_id": null,
+  "reviewer": {
+    "id": null,
+    "kind": null,
+    "capabilities": []
+  },
+  "review_mode": null,
+  "checked_at": null,
+  "cover_sha256": null,
+  "video_sha256": null,
+  "baseline": {
+    "cover_path": null,
+    "cover_sha256": null,
+    "video_path": null,
+    "video_sha256": null,
+    "inherit": [
+      "功能特写",
+      "材料区分",
+      "连贯装配细节",
+      "标题层级"
+    ],
+    "do_not_inherit": [
+      "旧黑底字幕",
+      "低位布局",
+      "局部过亮"
+    ]
+  },
+  "comparison_artifacts": [],
+  "cover_observations": [
+    {
+      "id": "benchmark_comparison",
+      "status": "pending",
+      "detail": null,
+      "artifacts": []
+    },
+    {
+      "id": "product_readability",
+      "status": "pending",
+      "detail": null,
+      "artifacts": []
+    },
+    {
+      "id": "material_hierarchy",
+      "status": "pending",
+      "detail": null,
+      "artifacts": []
+    },
+    {
+      "id": "cover_narrative",
+      "status": "pending",
+      "detail": null,
+      "artifacts": []
+    },
+    {
+      "id": "series_typography",
+      "status": "pending",
+      "detail": null,
+      "artifacts": []
+    }
+  ],
+  "official_reference_application": [],
+  "model_observations": [],
+  "shot_reviews": [],
+  "shot_review_fields": [
+    "shot_id",
+    "functional_spoken_window",
+    "native_action_frames",
+    "terminal_hold_frames",
+    "still_frames",
+    "hold_reason",
+    "visible_input",
+    "visible_transfer",
+    "visible_output",
+    "materials",
+    "occlusion_findings",
+    "artifacts",
+    "status"
+  ],
+  "blocking_findings": [],
+  "unchecked_scope": [
+    "未实际审阅"
+  ],
+  "corrective_action_verified": false,
+  "note": "工作底稿；独立封面设计可使用模型渲染或生成式结构示意，不能充当模型/CAD证据。五项封面观察及实际对照图归入2.2 cover_crop，模型/镜头观察归入既有报告；不是实际通过报告。",
+  "cover_production": {
+    "mode": null,
+    "path": null,
+    "actual_width": null,
+    "actual_height": null,
+    "tool": null,
+    "references": [],
+    "approved_text": [],
+    "actual_text_verbatim_checked": null,
+    "illustration_identity": null,
+    "topic_and_structure_claim_review": null,
+    "separate_from_video_model_acceptance": true
+  },
+  "detail_review_fields": [
+    "functional_partition",
+    "visible_parts_and_connections",
+    "assembly_interfaces",
+    "material_and_light_hierarchy",
+    "scale_and_micro_detail_representation",
+    "official_reference_feature_applied",
+    "full_size_and_thumbnail_artifacts"
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "schema": "zenith-user-corrections-worklist-1.0",
+  "status": "template_pending",
+  "job_id": null,
+  "revision_id": null,
+  "reviewer": null,
+  "source_script_sha256": null,
+  "cover_sha256": null,
+  "video_sha256": null,
+  "note": "人工工作底稿，逐项观察与证明归入原12项2.2 typed报告；不是自动门禁或新增验收类型。平台表单/操作另按发布SOP。",
+  "items": [
+    {
+      "id": "product_logic",
+      "stage": "Q-A",
+      "existing_report_types": [
+        "source_script",
+        "company_judgments"
+      ],
+      "criterion": "分类/用途/作用先于工艺；全稿知识层级一致",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    },
+    {
+      "id": "company_conclusions",
+      "stage": "Q-A",
+      "existing_report_types": [
+        "company_judgments"
+      ],
+      "criterion": "每家公司/卡点有具体结论及证据，竞争者有比较判断；无内部流程话/空泛否定",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    },
+    {
+      "id": "chain_questions_answers",
+      "stage": "Q-A",
+      "existing_report_types": [
+        "source_script"
+      ],
+      "criterion": "完整产品路径含整机/终端；第一句问候、悬念、问题ID与同序答案及视频卡对应",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    },
+    {
+      "id": "source_export_duration",
+      "stage": "Q-A",
+      "existing_report_types": [
+        "source_script",
+        "voice_identity"
+      ],
+      "criterion": "Zenith完整来源先取数据，内部口径、MD/TXT/JSON一致；本人实测估时与预算",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    },
+    {
+      "id": "visible_product_detail",
+      "stage": "Q-B",
+      "existing_report_types": [
+        "model_coverage"
+      ],
+      "criterion": "官网具体特征落实，内件开场/正文可见，基板/晶圆等细节按功能与尺度，不按数量",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    },
+    {
+      "id": "independent_cover",
+      "stage": "Q-B",
+      "existing_report_types": [
+        "cover_crop"
+      ],
+      "criterion": "独立封面主焦点/材料/大字，实际200/390基准图及原4种裁切；生成身份/实际像素/文字准确",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    },
+    {
+      "id": "motion_owner_voice_music",
+      "stage": "Q-B",
+      "existing_report_types": [
+        "voice_identity",
+        "opening_motion_rhythm",
+        "dynamic_playback",
+        "voice_music_listening"
+      ],
+      "criterion": "真实展开/环绕/合体、音乐落拍、本人清楚自然；代表正文动作实际覆盖解释窗口",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    },
+    {
+      "id": "final_subtitle_focus",
+      "stage": "Q-C/Q-D",
+      "existing_report_types": [
+        "layout_geometry",
+        "encoded_masked_review",
+        "real_device_overlay"
+      ],
+      "criterion": "最终编码透明字幕/卡片/标签/功能实体同屏，实际墨迹、遮罩、真实UI分别验",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    },
+    {
+      "id": "receipt_scope_and_generalization",
+      "stage": "Q-E",
+      "existing_report_types": [
+        "technical",
+        "dynamic_playback",
+        "voice_music_listening",
+        "cover_crop"
+      ],
+      "criterion": "不把机器/静帧/模板替观看实听；共性反馈查全期，原帖更新/新发分开，授权/审核/公开范围真实",
+      "status": "pending",
+      "actual_observation": null,
+      "evidence_artifacts": [],
+      "affected_segments_components_or_shots": [],
+      "corrective_action": null,
+      "acceptance_scope": null
+    }
+  ],
+  "blocking_findings": [],
+  "unchecked_scope": [
+    "模板未实际审读/看图/听看"
+  ]
+}

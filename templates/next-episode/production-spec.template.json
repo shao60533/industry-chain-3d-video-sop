@@ -1,0 +1,89 @@
+{
+  "schema": "video-production-spec-2.2",
+  "job_id": null,
+  "revision_id": null,
+  "producer_id": null,
+  "media": {
+    "frames": null,
+    "fps": 24,
+    "width": 1080,
+    "height": 1920
+  },
+  "bindings": {
+    "source_full": {
+      "path": null,
+      "sha256": null
+    },
+    "script": {
+      "path": null,
+      "sha256": null
+    },
+    "timing": {
+      "path": null,
+      "sha256": null
+    },
+    "font": {
+      "path": null,
+      "sha256": null
+    },
+    "renderer": {
+      "path": null,
+      "sha256": null
+    },
+    "audio": {
+      "path": null,
+      "sha256": null
+    },
+    "model": {
+      "path": null,
+      "sha256": null
+    },
+    "cover": {
+      "path": null,
+      "sha256": null
+    },
+    "title": {
+      "path": null,
+      "sha256": null
+    },
+    "body": {
+      "path": null,
+      "sha256": null
+    },
+    "component_inventory": {
+      "path": "component-inventory.json",
+      "sha256": null
+    }
+  },
+  "owner_voice_reference_sha256": null,
+  "chapters": [],
+  "shots": [],
+  "companies": [],
+  "components": [],
+  "captions": [],
+  "required_elements": [],
+  "requirements": {
+    "source_script": [],
+    "company_judgments": [],
+    "voice_identity": [],
+    "model_coverage": [],
+    "opening_motion_rhythm": [],
+    "technical": [],
+    "layout_geometry": [],
+    "encoded_masked_review": [],
+    "dynamic_playback": [],
+    "voice_music_listening": [],
+    "real_device_overlay": [],
+    "cover_crop": [
+      "9:16",
+      "3:4",
+      "200px",
+      "360px",
+      "benchmark_comparison",
+      "product_readability",
+      "material_hierarchy",
+      "cover_narrative",
+      "series_typography"
+    ]
+  }
+}

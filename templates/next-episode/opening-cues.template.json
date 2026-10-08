@@ -1,0 +1,62 @@
+{
+  "fps": 24,
+  "intervals": "left_closed_right_open",
+  "total_frames": 228,
+  "status": "candidate_design_not_rendered_or_listened",
+  "source_notes": null,
+  "existing_sfx_generator": null,
+  "existing_sfx_generator_scope": "历史固定帧号与光互连路径；只复用合成方法，不直接运行覆盖旧片",
+  "cues": [
+    {
+      "start_frame": 0,
+      "end_frame": 12,
+      "action": "产品特写出现",
+      "sfx": "short_hit@0",
+      "acceptance": "主角清楚，无黑场等待",
+      "music": "主拍启动，保留旋律动机"
+    },
+    {
+      "start_frame": 12,
+      "end_frame": 60,
+      "action": "当期公司按拍快闪",
+      "sfx": "tick@12,24,36,48",
+      "acceptance": "名单来自本期事实包，手机可读",
+      "music": "公司揭晓跟所选音乐鼓拍"
+    },
+    {
+      "start_frame": 60,
+      "end_frame": 96,
+      "action": "按实际层序错峰展开",
+      "sfx": "whoosh; staggered",
+      "acceptance": "外层避让，无穿插/新增零件",
+      "music": "展开随音乐推进和配器加层"
+    },
+    {
+      "start_frame": 96,
+      "end_frame": 120,
+      "action": "短悬停，小幅真实相机环绕",
+      "sfx": "optional subtle accents",
+      "acceptance": "能看清层间关系；不是静帧推近冒充环绕",
+      "music": "减鼓但保留低音/旋律律动"
+    },
+    {
+      "start_frame": 120,
+      "end_frame": 144,
+      "action": "真实收回闭合装配",
+      "sfx": "optional light click at actual assembly completion",
+      "acceptance": "真实闭合复位，收回平滑；音乐/动作共用帧号，关键落点±1帧且听看同步",
+      "music": "平滑合体落在所选重拍"
+    },
+    {
+      "start_frame": 144,
+      "end_frame": 228,
+      "action": "字标和标题配真实缓慢运镜，过渡正文",
+      "sfx": "four_note_motif; duck before narration",
+      "acceptance": "不能长复制静帧；第一句大家好这里Zenith；标题和正文字幕均查安全区，余响不盖人声",
+      "music": "品牌动机承接旋律，接人声前duck"
+    }
+  ],
+  "schema": "zenith-opening-cues/2.1",
+  "tempo_bpm": null,
+  "audio_direction": "有旋律、低音和鼓点推进的音乐主导，SFX仅点缀；先选音乐拍点再调帧段，不固定旧120 BPM"
+}

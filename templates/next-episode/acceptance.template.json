@@ -1,0 +1,62 @@
+{
+  "schema": "video-release-evidence-2.2",
+  "job_id": null,
+  "revision_id": null,
+  "video_sha256": null,
+  "profile_sha256": null,
+  "spec": {
+    "path": "production-spec.json",
+    "sha256": null
+  },
+  "release_ready": false,
+  "checks": {
+    "source_script": {
+      "status": "pending",
+      "report": null
+    },
+    "company_judgments": {
+      "status": "pending",
+      "report": null
+    },
+    "voice_identity": {
+      "status": "pending",
+      "report": null
+    },
+    "model_coverage": {
+      "status": "pending",
+      "report": null
+    },
+    "opening_motion_rhythm": {
+      "status": "pending",
+      "report": null
+    },
+    "technical": {
+      "status": "pending",
+      "report": null
+    },
+    "layout_geometry": {
+      "status": "pending",
+      "report": null
+    },
+    "encoded_masked_review": {
+      "status": "pending",
+      "report": null
+    },
+    "dynamic_playback": {
+      "status": "pending",
+      "report": null
+    },
+    "voice_music_listening": {
+      "status": "pending",
+      "report": null
+    },
+    "real_device_overlay": {
+      "status": "pending",
+      "report": null
+    },
+    "cover_crop": {
+      "status": "pending",
+      "report": null
+    }
+  }
+}

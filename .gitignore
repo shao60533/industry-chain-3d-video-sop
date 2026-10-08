@@ -1,0 +1,13 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+private/
+credentials/
+jobs/
+out/
+__pycache__/
+*.wav
+*.mp3
+*.mp4
+*.blend

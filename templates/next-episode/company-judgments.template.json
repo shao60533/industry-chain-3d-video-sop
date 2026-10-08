@@ -1,0 +1,32 @@
+{
+  "status": "template_not_content",
+  "rows": [
+    {
+      "segment_id": null,
+      "product_or_process": null,
+      "function": null,
+      "technical_barrier": null,
+      "bottleneck_judgment": null,
+      "bottleneck_evidence": [],
+      "company": null,
+      "competition_position": null,
+      "competitors": [],
+      "key_data": [],
+      "money_mechanism": null,
+      "cost_drivers": [],
+      "source_refs": [],
+      "model_semantic_nodes": [],
+      "action": null,
+      "reveal_company_ms": null,
+      "chain_layer": null,
+      "product_classification": null,
+      "use_case": null,
+      "classification_and_function_before_implementation": null,
+      "comparison_conclusion": null,
+      "company_specific_judgment": null,
+      "risk_judgment": null,
+      "source_coverage_decision": null
+    }
+  ],
+  "review_note": "逐公司给实际结论和证据；完整产品路径含整机/终端。用途先于实现，比较真实竞争者；修一段共性问题后复查全部环节。"
+}

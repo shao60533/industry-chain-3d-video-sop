@@ -1,0 +1,54 @@
+{
+  "schema": "video-check-report-2.2",
+  "check": null,
+  "status": "pending",
+  "job_id": null,
+  "revision_id": null,
+  "video_sha256": null,
+  "profile_sha256": null,
+  "bindings": {
+    "source_full": null,
+    "script": null,
+    "timing": null,
+    "font": null,
+    "renderer": null,
+    "audio": null,
+    "model": null,
+    "cover": null,
+    "title": null,
+    "body": null,
+    "component_inventory": null
+  },
+  "checked_at": null,
+  "reviewer": {
+    "id": null,
+    "kind": null,
+    "capabilities": []
+  },
+  "review_mode": null,
+  "scope": null,
+  "unchecked_scope": [
+    "尚未实际检查"
+  ],
+  "blocking_findings": [],
+  "observations": [],
+  "media_reference": null,
+  "played_intervals": [],
+  "beat_events": [],
+  "reference_audio_sha256": null,
+  "reviewed_frames": [],
+  "device": {},
+  "views": [],
+  "results": {
+    "full_decode": null,
+    "constant_pts": null,
+    "frame_count": null,
+    "audio_sync": null,
+    "black_scan": null,
+    "color_range_matrix": null,
+    "input_format_uniform": null,
+    "encoded_boundary_comparison": null
+  },
+  "frames_scanned": null,
+  "dataset": null
+}
