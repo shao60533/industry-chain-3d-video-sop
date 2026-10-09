@@ -1,7 +1,17 @@
 {
   "schema": "zenith-video-job-template/2.2",
   "job_id": null,
+  "content_key": null,
   "topic": null,
+  "content_kind": null,
+  "visual_style": null,
+  "producer_id": null,
+  "execution_constraints": {
+    "cost_status": "unknown",
+    "permission_status": "unknown",
+    "evidence": null
+  },
+  "workflow": null,
   "product": null,
   "source": {
     "url": null,
@@ -31,6 +41,7 @@
     "preview_accepted": false
   },
   "opening_candidate": {
+    "applicability": "3d候选；白板按实际渐进揭示与阅读节奏设计，不强套装配动作",
     "total_frames": 228,
     "sfx_cues": "opening-cues.template.json",
     "demo_accepted": false,

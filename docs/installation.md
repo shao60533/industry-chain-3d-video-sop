@@ -66,6 +66,8 @@ Windows 对应参数为 `-Dest ./local-skill -SkipSystemDeps`、`-DryRun`。默�
 
 重复安装会更新本安装器管理的文件，保留 `.venv`、`.local` 和自己的生产任务。未知目录和符号链接不会被直接覆盖；不用通过删除其他技能来解决冲突。
 
+在途任务另锁Workflow实现/规范的policy_sha256；安装更新不会改旧job或迁移旧批准。需继续在途任务时使用原固定提交/技能副本，不能编辑pin绕过。新任务使用新规范，见[统一Workflow](codex-workflow.md)。状态/证据核心只需Python标准库，可先验证代码；基础渲染自检与真实成片验收仍分开。
+
 ## 安装后
 
 技能在下一个 Codex 回合可用，使用：
@@ -79,6 +81,7 @@ Windows 对应参数为 `-Dest ./local-skill -SkipSystemDeps`、`-DryRun`。默�
 ```bash
 .venv/bin/python scripts/doctor.py --smoke-test
 .venv/bin/python scripts/init_job.py --output ./jobs/my-first-product
+.venv/bin/python scripts/workflow.py --job ./jobs/my-first-product status
 ```
 
 Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。新目录默认 `produce_only`，原始来源、音色、账号和验收由本次任务实际填写；不会发布。

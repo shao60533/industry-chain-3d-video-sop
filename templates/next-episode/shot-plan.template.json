@@ -1,0 +1,16 @@
+{
+  "schema": "video-shot-plan-1",
+  "status": "pending",
+  "job_id": null,
+  "revision_id": null,
+  "content_kind": null,
+  "visual_style": null,
+  "source_script_sha256": null,
+  "shots": [],
+  "required_shot_fields": [
+    "shot_id", "script_segment_id", "source_refs", "production_method", "selection_reason",
+    "inputs", "spoken_window", "action_intervals", "deterministic_overlays", "focus", "caption_ids"
+  ],
+  "production_methods": ["native_3d", "native_2d", "deterministic_composite", "image_to_video", "provided_clip"],
+  "note": "按镜头选择已授权且成本已知的方法；数字/单位/日期/字幕独立确定性合成，禁用可辨识人物头像。空模板不是已完成分镜；3D film-plan/组件适配另须符合原2.2契约。"
+}

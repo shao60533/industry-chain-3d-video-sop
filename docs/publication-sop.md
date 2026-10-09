@@ -1,5 +1,7 @@
 # Codex 视频发布 SOP · 小红书适配
 
+题材和画风共用本发布契约，唯一任务/状态源见[统一Workflow](codex-workflow.md)。generated、步骤accepted、发布就绪、submitted和public_verified含义独立。新增的check-release-bindings只验结构/SHA，不能替代完整质量preflight，不授予发布权，也没有本包发布运行器。
+
 > 本文规定 Codex 和适配器应执行的行为。文中的原内部程序/插件名称未随仓库分发，接入责任见[工具适配说明](tool-adapters.md)。
 
 版本 xhs-video-2.2，2026-10-04。此文件是现行视频发布入口。制作见[视频制作SOP](production-sop.md)。历史提交授权只覆盖原片，SOP更新不新增发布权限。

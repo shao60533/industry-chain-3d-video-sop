@@ -1,5 +1,9 @@
 # Codex 下一集启动包
 
+2026-10-09：以[统一Workflow](../../docs/codex-workflow.md)为唯一规范入口，使用init_job建立job.json内持久状态，拒绝覆盖。独立填content_kind（题材）与visual_style（画风）、修订/制作者与成本/权限依据。下面产业链内容项按题材适用，3D图稿/装配/开场项按画风适用；白板用图表/关系/渐进揭示，不能分成第二条业务流程。E-model目录名兼容保留。
+
+step-evidence / step-approval保存早期步骤证据及具体输入/输出版本的批准；badcase / recovery-evidence保存最早根因、漏检、最小修复及原失败/旧成功回归。shot-plan记录按镜头的制作方法，visual-inventory供白板图示使用。它们都是pending底稿，不是新增第13项成片报告。完整checker与发布运行器尚未提供，12项结构/SHA通过也不签发release_ready。
+
 2026-10-04。制作准备模板已完成，选题与指定完整来源尚未填；不是已启动的一期视频，也没有发布授权。既有任务与历史产物保持原状。
 
 现行[制作SOP](../../docs/production-sop.md)、[发布SOP](../../docs/publication-sop.md)、复盘。
@@ -8,14 +12,14 @@
 
 先填写 [Codex 本期任务契约](codex-brief.template.md)，然后按以下步骤执行。
 
-1. 复制模板到新的job目录，填写topic/product、完整来源URL/版本/哈希、集数和约5分钟预算。不要运行旧v24或光互连固定帧脚本。
+1. 用init_job创建新目录，填写topic/content_kind/visual_style、完整来源URL/版本/哈希、集数/预算与执行条件。不要直接复制模板中的workflow=null冒充已初始化，不运行旧固定帧脚本。
 2. script.template.md只提供段落骨架。先写一层完整观点，用company-judgments表检查用途、门槛、具体卡点、公司竞争位置、证据和赚钱机制，再完成整稿。
 3. approved.md为唯一确认源。TXT与JSON从同一源导出；script_bundle只导出文本与检查漂移，不负责确认、事实审稿、TTS或渲染。
 4. 在 job.voice_lock 填入自行提供并获授权的本地音色参考及实际SHA。先做30–60秒试听，接受后再填speed。
 5. 做同一母产品的整体/拆解/内部功能图，封面独立设计，可另设模型镜头或使用生成式封面；按[视觉基准](../../docs/visual-quality.md)与实际光模块、用户指定的相关封面及编码近景作200/390px同宽对照。填写visual-review.template.json的具体判断，再分件建模；封面不充当模型交付，不能直接套用最大展开图或只验标题可读。
 6. opening-cues按帧号做独立9.5秒无口播样片：真实展开、短悬停环绕、真实合体，节奏音乐带动展开/环绕/合体，轻音效跟动作落点，接第一句本人旁白。BPM按本期选，不照搬120；当前cue是设计，尚未渲染/实听。
 7. 样片含两行长字幕、财务卡、问答、部件图注和结构动作。先锁safe-layout.template.json及字体SHA测bounds，360/390宽带遮罩和实际界面验收，再长渲染；子模块有参考和成片可见近景。
-8. 全片导出layout.jsonl，绑定当前视频/profile SHA填acceptance.template.json的12项证据。缺项pending；可交本地审阅包，release_ready=true才冻结发布包。
+8. 全片导出layout.jsonl，绑定当前视频/profile/spec/全依赖SHA填12项证据。缺项pending；可交本地审阅包。必须接入完整checker并完成实际领域验收才可release_ready与冻结，本包结构校验不能代替。
 9. H manifest含production_acceptance，由Codex调用自行配置的质量预检通过后再启动平台适配器；原授权/话题/群/封面/AI/定时/单次attempt不省。
 
 同源导出/校验命令（仅在具体稿件完成后使用，替换绝对路径占位符）：

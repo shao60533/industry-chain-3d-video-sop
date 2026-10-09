@@ -1,0 +1,19 @@
+{
+  "schema": "video-step-evidence-1",
+  "status": "pending",
+  "step": null,
+  "job_id": null,
+  "revision_id": null,
+  "config_sha256": null,
+  "policy_sha256": null,
+  "inputs": {},
+  "outputs": {},
+  "checked_at": null,
+  "reviewer": {"id": null, "kind": null, "capabilities": []},
+  "review_mode": null,
+  "scope": [],
+  "unchecked_scope": ["未实际检查"],
+  "blocking_findings": [],
+  "observations": [],
+  "approval": null
+}

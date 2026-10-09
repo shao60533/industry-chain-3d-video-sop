@@ -1,4 +1,8 @@
-# 产业链视频质量验收
+# 视频质量验收
+
+2026-10-09统一范围：以[统一 Workflow](codex-workflow.md)为规范入口，content_kind与visual_style独立。12项报告槽名保留；model_coverage和opening_motion_rhythm按画风核3D结构/装配或白板元素/关系/渐进揭示，纯白板不套用opening/body模型装配义务。其他共同质量门槛不变。混用3D镜头仍验该镜头的原专属质量。
+
+本包新增的是scripts/evidence.py的结构/SHA最小核心：重读实际文件、typed报告、观察证明和spec_sha256，缺失/pending/旧SHA阻断；它始终返回release_ready=false、production_checks=pending。以下全帧几何、最终探测、内容语义、听看/设备及美术是完整checker与复核者的领域义务，尚未全部实现，不能把结构检查退出0当成发布preflight。
 
 > 本文规定 Codex 和适配器应执行的行为。文中的原内部程序/插件名称未随仓库分发，接入责任见[工具适配说明](tool-adapters.md)。
 
@@ -17,7 +21,7 @@
 | 关口 | 何时检查 | 具体产出与放行条件 | 失败后做什么 |
 |---|---|---|---|
 | Q-A 稿件 | 长渲染前 | 指定完整原文/锚点、唯一同源稿；逐公司作用/门槛/卡点/竞争/盈利判断；开场问题和结尾回答成对；音轨估时与拆集安排 | 先修逻辑；不靠加快语速掩盖重复或长稿 |
-| Q-B 设计样片 | 全片前 | 同源整体/展开/内部细节与光互连基准对照；30–60秒本人试听；8–10秒真实展开/环绕/合体与节奏音乐；另取含两行字幕/卡片/标签/小部件动作的难例样片 | 修最难的同屏场景，再长渲染；不是只验最好看的开头 |
+| Q-B 设计样片 | 全片前 | 分镜关键帧与代表小样批准绑定版本；30–60秒获授权音色试听；3D整体/展开/内部与装配动作，白板图表口径/关系/渐进揭示；难例含两行字幕/卡片/标签/解释焦点 | 修最难的同屏场景，再长渲染；不是只验最好看的开头 |
 | Q-C 成片机器检查 | 合成后 | 实际最终文件、全解码/PTS/黑帧/同步、全帧真实字形与功能焦点几何、编码边界；报告检查范围准确 | 保留失败文件，修受影响镜头；重新生成对应证据 |
 | Q-D 成片感知检查 | 冻结前 | 最终编码各镜头起点/中点/终点与边界前后；360/390带遮罩；整片连续音画播放及实听；本人参考音色比较；真实设备正常播放UI；封面9:16/3:4/200/360 | 逐帧号/片段记录缺陷与结论；静帧不算动态，波形/ASR不算实听，模拟不算手机实测 |
 | Q-E 冻结与提交 | 上传前、提交前 | 2.2 typed reports、spec和全资产同版；本地preflight＋实际xhs_video_prepare/publish强制复查；原授权/账号/话题/群/封面/AI/时间/单次attempt仍验 | 非零/版本变动停止网页写入；旧状态可只读，不能重发补证 |
@@ -25,6 +29,8 @@
 制作者先自检，复核按原稿和最终文件重新看；记录producer_id、reviewer、review_mode。作者自检不能写成独立复审。自动检查不负责判断观点是否有价值，复核人仍须真正读源、看图、听声音；文字模型无音频/视频感知能力时须写pending。
 
 ## 内容与模型的可见质量
+
+以下产品结构、层序、模型、组件opening/body与光模块材料对标适用于3D画面；产业链全链/卡点判断适用于该题材。白板按统一规范记录图表口径、元素/箭头/图例与阅读顺序，并保留同源脚本、观点/证据、文字准确、功能焦点及实际感知检查。报告槽名兼容不代表强制同一种表达。
 
 **视觉质量不能由裁切通过替代（2026-10-05）：** [系列视觉基准](visual-quality.md)纳入Q-B与Q-D。cover_crop保持四种视图，同时在spec.requirements中要求benchmark_comparison、product_readability、material_hierarchy、cover_narrative、series_typography五项观察和实际对照证明。任一美术项失败，综合封面检查不得passed。程序校验观察覆盖与文件，不能自动判断美术优劣；具体结论仍须看图。旧裁切通过仅保留其历史范围。
 
@@ -67,9 +73,9 @@ PIL需实际textbbox；浏览器需字体加载后实际glyph bounds。每个文
 
 spec含job/revision/制作者、实际媒体参数、覆盖全部时间线的chapters/shots、所有公司/组件、最终字幕文本/帧区间、组件opening/body焦点窗、逐项requirements、原文/稿/对齐/字体/渲染器/音轨/模型/封面/标题/正文的路径与SHA。requirements至少包含代码从实际章节、镜头、公司、组件推导的最低集合，不能挑一家公司代替全期。
 
-acceptance.json为video-release-evidence-2.2，每项status和独立类型JSON report引用。report为video-check-report-2.2，包含check/status/job/revision/video/profile/全部依赖SHA、检查者/时间/真实范围/未验范围/未解决阻断/逐项具体观察与帧段/证明文件。公司报告逐字段写观点；模型报告给opening_frame/body_frame及可见性、连接判断；动态/实听报告绑定实际最终媒体和完整播放区间；设备明确actual_platform_playback；技术每个结果明确true及全扫描数量。各类型专用字段见模板。
+acceptance.json为video-release-evidence-2.2，每项status和独立类型JSON report引用。report为video-check-report-2.2，包含check/status/job/revision/video/profile/spec_sha256/全部依赖SHA、检查者/时间/真实范围/未验范围/未解决阻断/逐项具体观察与帧段/证明文件。spec补content_kind/visual_style和实际layout绑定；3D保留model/component_inventory，白板使用visual_project/visual_inventory。公司报告逐字段写观点；3D模型报告给opening_frame/body_frame及可见性、连接判断，白板记录对应图示元素/关系/镜头覆盖；动态/实听绑定实际最终媒体和完整播放区间；设备明确actual_platform_playback；技术每个结果明确true及全扫描数量。旧报告保留原版本，不能仅补字段冒充重新验收。
 
-程序重读报告类型/状态/范围/覆盖、所有依赖哈希、PNG尺寸和全帧layout，最终文件另ffprobe；缺项、旧SHA、跨job、错类型、无关文字、模拟设备、未来检查时间、虚假独立身份、未解决阻断均失败。证明文件限验收包内，显式命名原件依赖可在外部引用。**这些是结构与版本验证，不是“自动证明检查者诚实”或“自动判文案有观点”。** 样例测试中的synthetic记录绝不能复制为实际验收。
+完整checker须重读报告类型/状态/范围/覆盖、所有依赖哈希、PNG尺寸和全帧layout，最终文件另ffprobe；缺项、旧SHA、跨job、错类型、无关文字、模拟设备、未来检查时间、虚假独立身份、未解决阻断均失败。证明文件限验收包内，显式命名原件依赖可在外部引用。**结构与版本验证不自动证明检查者诚实或文案有观点。** 本包实现的子集见统一规范；synthetic测试记录绝不能复制为实际验收。
 
 > 原内部命令未随本仓库分发。工具对接要求见工具适配说明；不可将这里的流程当作已安装的一键命令。
 

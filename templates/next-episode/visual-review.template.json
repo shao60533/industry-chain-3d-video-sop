@@ -1,5 +1,8 @@
 {
   "schema": "zenith-visual-review-1.1",
+  "content_kind": null,
+  "visual_style": null,
+  "applicability": "产品材料/几何/装配字段按3D适用；白板同槽检查主题辨识、线条填色信息层级、图表口径/关系与揭示顺序，非强制产品拆解。",
   "status": "pending",
   "job_id": null,
   "revision_id": null,

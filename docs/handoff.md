@@ -1,4 +1,6 @@
-# 产业链视频单阶段交接模板
+# 视频单阶段交接模板
+
+交接沿用[统一Workflow](codex-workflow.md)和唯一job.json，不重新生成总任务。content_kind与visual_style独立；保留在途policy_sha256，实际批准绑定输入/输出版本。下面模型/装配细项只按3D适用，白板交接对应图示/可编辑工程。
 
 > 本文规定 Codex 和适配器应执行的行为。文中的原内部程序/插件名称未随仓库分发，接入责任见[工具适配说明](tool-adapters.md)。
 
@@ -7,9 +9,13 @@ video-2.2，2026-10-04。现行规则见[制作SOP](production-sop.md)及[视频
 ```text
 任务：<本阶段具体交付>
 job_id / content_key：<唯一任务 / 稳定公开内容身份>
+content_kind / visual_style：<题材与画风独立>
+workflow：<job.json；当前step/state、revision_id、policy_sha256；不修改版本锁>
 目录：<绝对路径>
 模式/阶段：<produce_only / prepare_draft / publish；A–H>
 唯一输入：<来源版本/哈希、确认稿、当前资产、实际工具入口>
+依赖与失败：<inputs/outputs/evidence SHA；最早根因、badcase、回流步骤、剩余重试与恢复条件>
+批准版本：<关键帧/试听/样片实际批准依据及绑定输入/输出；不把自审作用户同意>
 已有接受选择：<不重复问；本人音色、主副题、时长/画幅、确认依据>
 制作复核执行卡：<本阶段相关项、实际观察与全期受影响范围；不复制全部历史>
 稿件逻辑：<用途先于实现；具体公司/卡点/盈利观点；开场问题ID与结尾答案/画面对应>

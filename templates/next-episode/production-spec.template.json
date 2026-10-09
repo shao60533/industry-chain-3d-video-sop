@@ -3,6 +3,8 @@
   "job_id": null,
   "revision_id": null,
   "producer_id": null,
+  "content_kind": null,
+  "visual_style": null,
   "media": {
     "frames": null,
     "fps": 24,
@@ -50,12 +52,17 @@
       "path": null,
       "sha256": null
     },
+    "layout": {
+      "path": null,
+      "sha256": null
+    },
     "component_inventory": {
       "path": "component-inventory.json",
       "sha256": null
     }
   },
   "owner_voice_reference_sha256": null,
+  "visual_binding_note": "3d 保留 model/component_inventory；whiteboard 改用 visual_project/visual_inventory 并明确图示依据。按实际文件填绑定，所有12项报告保持 pending，不能用 N/A 绕过。",
   "chapters": [],
   "shots": [],
   "companies": [],
