@@ -71,11 +71,15 @@ init_job 拒绝覆盖已有目录，把 video-workflow-1 的 A–H 状态写入 
 - blocked / paused / invalidated：缺口或失败阻塞 / 主动暂停 / 依赖改变导致旧证据失效。
 - 发布另用 not_submitted / submission_unknown / submitted / public_verified。submitted 需实际提交回执；审核中或定时仍不证明公开。public_verified 需当前内容的实际公开页面证据。核心只读这些字段，不执行或编造转换；原平台 scheduled / reviewing / rejected / published 详情仍保存在原始回执。
 
-每步保存 inputs / outputs / evidence / config_sha256 / attempts / retries / failure，历史事件保留前次绑定和失败记录。开始必须先验上游 accepted；下游稿件、分镜、音轨、timing、字体/profile、视觉工程 SHA 必须对应已接受上游。不能用未批准的新稿同时挂上旧稿批准证据。
+每步保存 inputs / outputs / evidence / config_sha256 / attempts / retries / failure / recovery，历史事件保留前次绑定和失败记录。开始必须先验上游 accepted；下游稿件、分镜、音轨、timing、字体/profile、视觉工程 SHA 必须对应已接受上游。不能用未批准的新稿同时挂上旧稿批准证据。
+
+授权依据自动进入每步inputs的execution.evidence，逐次status、准出、产物登记及暂停恢复均重验实际文件SHA；开始后的撤销或替换会使最早依赖步骤及后续失效，不只检查job里的路径字符串。
 
 每次推进重算任务配置、所有实际文件、报告和证明 SHA；文件名不变也重算。更改输入、输出、证明或 job 配置使最早受影响步骤及后续已执行步骤 invalidated，旧报告与历史保留。当前核心采用保守的顺序依赖；领域工具可按[重验矩阵](acceptance.md#改动后重验范围)生成新版复用记录，不能篡改旧报告 SHA。
 
 status 不写文件，会给出当前有效状态与 dependencies_stale；失效在下一次推进时持久化。独占 .workflow.lock、写入前配置比对、原子替换和回读防止两个推进者覆盖状态。锁无法自动抢占；进程异常遗留锁时先确认原进程结束并保留现场，再由本地维护者处理。
+
+.workflow.lock也是未来发布适配器的同一job共享排他锁。适配器须按“平台/账号publisher锁→workflow.locked(job_root)”固定顺序获取，在冻结包读取/质量复查、草稿marker、claim attempt及原始回执持久化的本地临界区持有它；不得另建可并行写同一job的发布锁，也不得在持锁时嵌套调用transition。锁只提供排他性，不授予质量或发布权限。核心在保存前及原子替换前再查attempt/result；发现新记录拒绝状态写入并保留原文件。未遵守共享锁的外部写入器仍须停用排查；本仓库没有真实发布器，不把竞态fixture称为实际重复发布。
 
 在途任务绑定实现和领域规范的 policy_sha256。技能更新使其不一致时仅可 status，不自动改 pin 或迁移。使用原固定提交/技能副本完成在途任务；需迁移时另做明确版本的恢复/交接，保留原任务及证据，旧批准不自动继承。旧2.2任务不会自动添加或覆盖状态，继续使用其原工具只读恢复。
 
@@ -118,6 +122,8 @@ python3 scripts/workflow.py --job ./jobs/episode resume --step C --resolution C-
 badcase绑定job/revision/step/config/policy和输入/输出SHA，必填预期、实际、最早根因、漏检原因、最小修复、回归用例和恢复条件，并引用现场证明。fact_error → A、script_error → B、visual_error → C、audio_error → D、sample_error → E；工具、能力、成本和权限失败留在当前步。回流目的地不得晚于失败步。修根因并复查全期同类问题，不能只修点名镜头。报告、证明和badcase使用版本化文件名，保留原件，不覆盖历史失败现场。
 
 失败阻塞根因步骤，使依赖步骤失效。recovery-evidence 须绑定原 badcase SHA 和恢复条件，所有回归结果 passed 且有证明，至少包含 original_failure 和 previous_success。每步最多一次失败恢复重试；再次失败继续 blocked，回到根因与工具能力，不自动开新任务清零。暂停恢复也重验依赖；输入变更不能恢复为旧 generated/accepted。
+
+resume先重验badcase.artifacts原失败证明及全部回归证明，再保存活动recovery绑定（原badcase、恢复JSON、失败/回归/授权证明）。即使failure清空、重试仍pending，也持续核这些依赖；start把recovery.record/resolution/proof_*加入输入版本。删除或替换任一原件会阻止重试、准出和暂停恢复，并使依赖步骤失效。历史事件保留，但不能以历史passed替代当前有效恢复证据；恢复不清零重试计数。
 
 submission_unknown 或任何已有 attempt/result 一律生产状态只读，不删除原 attempt，不重建稿、不补签、不重发。[发布 SOP](publication-sop.md)保留现有锁、唯一原稿、账号、质量前置和单次提交要求。归档失败不触发重发。
 

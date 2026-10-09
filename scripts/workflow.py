@@ -74,7 +74,7 @@ def new_workflow() -> dict:
     return {"schema": VERSION, "policy_sha256": policy_sha256(),
             "steps": {step: {"state": "pending", "attempts": 0, "retries": 0,
                              "config_sha256": None, "inputs": {}, "outputs": {}, "evidence": None,
-                             "failure": None, "blocker": None, "paused_from": None} for step in STEPS},
+                             "failure": None, "recovery": None, "blocker": None, "paused_from": None} for step in STEPS},
             "publication": {"status": "not_submitted", "attempt": None,
                             "receipt": None, "public_evidence": None}, "history": []}
 
@@ -127,12 +127,23 @@ def status(root: Path) -> dict:
             "production_checks": "pending"}
 
 
-def execution_allowed(root: Path, job: dict) -> None:
+def execution_allowed(root: Path, job: dict, snapshot: dict[Path, str] | None = None) -> None:
     constraints = job.get("execution_constraints")
     require(isinstance(constraints, dict), "execution_constraints_required")
     require(constraints.get("cost_status") == "no_paid_calls", "cost_unknown_or_paid_adapter_required")
     require(constraints.get("permission_status") == "authorized", "permission_unknown")
-    verify_ref(root, constraints.get("evidence"))
+    verify_ref(root, constraints.get("evidence"), snapshot=snapshot)
+
+
+def recovery_bindings(state: dict) -> dict:
+    recovery = state.get("recovery")
+    if recovery is None:
+        return {}
+    require(isinstance(recovery, dict), "recovery_bindings_invalid")
+    proofs = recovery.get("proofs")
+    require(isinstance(proofs, list) and bool(proofs), "recovery_proof_required")
+    return {"recovery.record": recovery.get("record"), "recovery.resolution": recovery.get("resolution"),
+            **{f"recovery.proof_{index}": ref for index, ref in enumerate(proofs)}}
 
 
 def refs_from_manifest(root: Path, name: str, required: set[str], external: bool) -> dict:
@@ -191,7 +202,7 @@ def invalidate(job: dict, step: str, code: str) -> None:
     previous = {}
     for key in STEPS[STEPS.index(step):]:
         state = job["workflow"]["steps"][key]
-        if state["state"] != "pending":
+        if state["state"] != "pending" or state.get("recovery") is not None:
             previous[key] = json.loads(json.dumps(state))
             state["state"] = "invalidated"
             state["blocker"] = code
@@ -201,15 +212,19 @@ def invalidate(job: dict, step: str, code: str) -> None:
 def refresh(root: Path, job: dict) -> bool:
     for step in STEPS:
         state = job["workflow"]["steps"][step]
-        if state["state"] in ("pending", "invalidated") or not state["config_sha256"]:
-            continue
         try:
-            require(state["config_sha256"] == config_sha256(job), "job_config_changed")
-            for field in ("inputs", "outputs"):
-                for ref in state[field].values():
-                    verify_ref(root, ref, external=(field == "inputs"))
-            if state["evidence"] is not None:
-                validate_step(root, job, step, state["evidence"])
+            snapshot: dict[Path, str] = {}
+            # A completed recovery stays a prerequisite even before the retry starts.
+            for ref in recovery_bindings(state).values():
+                verify_ref(root, ref, snapshot=snapshot)
+            if state["state"] not in ("pending", "invalidated") and state["config_sha256"]:
+                require(state["config_sha256"] == config_sha256(job), "job_config_changed")
+                for field in ("inputs", "outputs"):
+                    for ref in state[field].values():
+                        verify_ref(root, ref, external=(field == "inputs"), snapshot=snapshot)
+                if state["evidence"] is not None:
+                    validate_step(root, job, step, state["evidence"])
+            recheck(snapshot)
         except GateError as exc:
             invalidate(job, step, str(exc))
             return True
@@ -242,6 +257,7 @@ def save(root: Path, job: dict, original: bytes) -> None:
             stream.flush()
             os.fsync(stream.fileno())
         require(path.read_bytes() == original, "concurrent_job_change")
+        require(not publication_read_only(root, job), "publication_read_only")
         os.replace(temporary, path)
         require(path.read_bytes() == content, "job_readback_failed")
     finally:
@@ -261,6 +277,8 @@ def apply(root: Path, job: dict, action: str, step: str, **args) -> None:
             require(nonempty(job.get(field)), "job_identity_required")
         execution_allowed(root, job)
         inputs = refs_from_manifest(root, args.get("manifest"), INPUTS[step], True)
+        inputs["execution.evidence"] = job["execution_constraints"]["evidence"]
+        inputs.update(recovery_bindings(state))
         for key, (provider, field, item) in INPUT_PROVIDERS.get(step, {}).items():
             require(inputs[key]["sha256"] == job["workflow"]["steps"][provider][field][item]["sha256"],
                     "input_does_not_match_accepted_version")
@@ -331,8 +349,16 @@ def apply(root: Path, job: dict, action: str, step: str, **args) -> None:
             require(state["retries"] < 1, "retry_limit")
             require(args.get("resolution") is not None, "recovery_required")
             failure = state["failure"]
-            verify_ref(root, failure["record"])
+            snapshot: dict[Path, str] = {}
+            record_path = verify_ref(root, failure["record"], snapshot=snapshot)
+            badcase = load_json(record_path)
+            require(isinstance(badcase.get("artifacts"), list) and bool(badcase["artifacts"]),
+                    "badcase_proof_required")
+            for ref in badcase["artifacts"]:
+                verify_ref(root, ref, snapshot=snapshot)
             resolution_path = file_path(root, args["resolution"])
+            resolution_ref = {"path": resolution_path.relative_to(root).as_posix(), "sha256": sha256(resolution_path)}
+            verify_ref(root, resolution_ref, snapshot=snapshot)
             resolution = load_json(resolution_path)
             require(resolution.get("schema") == "video-recovery-evidence-1" and resolution.get("status") == "passed",
                     "recovery_required")
@@ -347,11 +373,16 @@ def apply(root: Path, job: dict, action: str, step: str, **args) -> None:
                 require(test.get("status") == "passed", "regression_not_passed")
                 require(isinstance(test.get("artifacts"), list) and bool(test["artifacts"]), "regression_proof_required")
                 for ref in test["artifacts"]:
-                    verify_ref(root, ref)
-            execution_allowed(root, job)
+                    verify_ref(root, ref, snapshot=snapshot)
+            execution_allowed(root, job, snapshot)
+            recheck(snapshot)
+            recovery = {"record": failure["record"], "resolution": resolution_ref,
+                        "proofs": [{"path": path.relative_to(root).as_posix(), "sha256": expected}
+                                   for path, expected in sorted(snapshot.items())
+                                   if path not in (record_path, resolution_path)]}
             event(job, "recovery", step, failure=failure,
-                  resolution={"path": resolution_path.relative_to(root).as_posix(), "sha256": sha256(resolution_path)})
-            state.update(state="pending", failure=None, blocker=None, config_sha256=None,
+                  resolution=resolution_ref, bindings=recovery)
+            state.update(state="pending", failure=None, recovery=recovery, blocker=None, config_sha256=None,
                          inputs={}, outputs={}, evidence=None)
             state["retries"] += 1
         else:
@@ -385,6 +416,7 @@ def transition(root: Path, action: str, step: str, **args) -> dict:
         # A file replaced during a gate cannot become accepted in the saved job.
         require(not refresh(root, job), "dependencies_changed_during_transition")
         require(job["workflow"]["policy_sha256"] == policy_sha256(), "policy_version_mismatch")
+        require(not publication_read_only(root, job), "publication_read_only")
         save(root, job, original)
     return status(root)
 

@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import evidence
@@ -20,7 +21,12 @@ class WorkflowTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
-        self.root = Path(self.temporary.name) / "synthetic-job"
+        self.prepare_job(Path(self.temporary.name) / "synthetic-job")
+
+    def prepare_job(self, root: Path) -> None:
+        self.root = root
+        self.badcase_sequence = 0
+        self.recovery_sequence = 0
         init_job.initialize(self.root)
         self.job = self.root / "job.json"
         data = self.read(self.job)
@@ -232,8 +238,60 @@ class WorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(evidence.GateError, "dependencies_changed"):
             self.run_action("resume")
 
+    def revoke_execution_evidence(self, *, delete: bool = False) -> None:
+        ref = self.read(self.job)["execution_constraints"]["evidence"]
+        path = self.root / ref["path"]
+        if delete:
+            path.unlink()
+        else:
+            path.write_text("synthetic revoked scope", encoding="utf-8")
+
+    def test_authorization_revoked_after_start_prevents_output_recording(self) -> None:
+        inputs = {key: self.file(f"inputs/{key}.txt") for key in workflow.INPUTS["A"]}
+        self.write(self.root / "inputs.json", inputs)
+        self.run_action("start", manifest="inputs.json")
+        outputs = {key: self.file(f"outputs/{key}.txt") for key in workflow.OUTPUTS["A"]}
+        self.write(self.root / "outputs.json", outputs)
+        self.revoke_execution_evidence(delete=True)
+        with self.assertRaisesRegex(evidence.GateError, "dependencies_changed"):
+            self.run_action("record", manifest="outputs.json")
+        self.assertEqual(self.step("A")["state"], "invalidated")
+
+    def test_authorization_revoked_after_generation_prevents_acceptance(self) -> None:
+        self.generate()
+        self.revoke_execution_evidence(delete=True)
+        before = self.job.read_bytes()
+        summary = workflow.status(self.root)
+        self.assertTrue(summary["dependencies_stale"])
+        self.assertEqual(summary["steps"]["A"], "invalidated")
+        self.assertEqual(self.job.read_bytes(), before)
+        with self.assertRaisesRegex(evidence.GateError, "dependencies_changed"):
+            self.accept()
+        self.assertEqual(self.step("A")["state"], "invalidated")
+        self.assertFalse(workflow.status(self.root)["release_ready"])
+
+    def test_authorization_changed_after_acceptance_invalidates_downstream(self) -> None:
+        self.generate()
+        self.accept()
+        self.generate("B")
+        self.revoke_execution_evidence()
+        self.assertTrue(workflow.status(self.root)["dependencies_stale"])
+        with self.assertRaisesRegex(evidence.GateError, "dependencies_changed"):
+            self.accept("B")
+        self.assertEqual(self.step("A")["state"], "invalidated")
+        self.assertEqual(self.step("B")["state"], "invalidated")
+
+    def test_authorization_changed_during_pause_prevents_resume(self) -> None:
+        self.generate()
+        self.run_action("pause", reason="synthetic pause")
+        self.revoke_execution_evidence()
+        with self.assertRaisesRegex(evidence.GateError, "dependencies_changed"):
+            self.run_action("resume")
+        self.assertEqual(self.step("A")["state"], "invalidated")
+
     def badcase(self, category: str = "tool_error", step: str = "A") -> str:
-        name = "proofs/badcase.json"
+        self.badcase_sequence += 1
+        name = f"proofs/{step}-badcase-{self.badcase_sequence}.json"
         job = self.read(self.job)
         state = self.step(step)
         self.write(self.root / name, {
@@ -250,7 +308,8 @@ class WorkflowTests(unittest.TestCase):
 
     def recovery(self) -> str:
         failure = self.step("A")["failure"]
-        name = "proofs/recovery.json"
+        self.recovery_sequence += 1
+        name = f"proofs/recovery-{self.recovery_sequence}.json"
         self.write(self.root / name, {
             "schema": "video-recovery-evidence-1", "status": "passed",
             "failure_sha256": failure["record"]["sha256"],
@@ -277,6 +336,60 @@ class WorkflowTests(unittest.TestCase):
         self.run_action("fail", record=self.badcase())
         with self.assertRaisesRegex(evidence.GateError, "retry_limit"):
             self.run_action("resume", resolution=self.recovery())
+
+    def test_active_recovery_dependencies_remain_required_across_all_resume_states(self) -> None:
+        dependencies = ("badcase", "recovery", "original_failure", "previous_success", "failure_proof")
+        for phase in ("pending", "generated", "accepted", "paused"):
+            for dependency in dependencies:
+                with self.subTest(phase=phase, dependency=dependency):
+                    self.prepare_job(Path(self.temporary.name) / f"{phase}-{dependency}")
+                    self.generate()
+                    self.run_action("fail", record=self.badcase())
+                    failure = self.step("A")["failure"]
+                    resolution = self.recovery()
+                    self.run_action("resume", resolution=resolution)
+                    if phase != "pending":
+                        self.generate()
+                    if phase == "accepted":
+                        self.accept()
+                    elif phase == "paused":
+                        self.run_action("pause", reason="synthetic pause")
+                    paths = {"badcase": failure["record"]["path"], "recovery": resolution,
+                             "original_failure": "proofs/original_failure.txt",
+                             "previous_success": "proofs/previous_success.txt",
+                             "failure_proof": "proofs/failure.txt"}
+                    (self.root / paths[dependency]).unlink()
+                    summary = workflow.status(self.root)
+                    self.assertTrue(summary["dependencies_stale"])
+                    self.assertEqual(summary["steps"]["A"], "invalidated")
+                    with self.assertRaisesRegex(evidence.GateError, "dependencies_changed"):
+                        if phase == "pending":
+                            self.generate()
+                        elif phase == "generated":
+                            self.accept()
+                        elif phase == "accepted":
+                            self.generate("B")
+                        else:
+                            self.run_action("resume")
+                    self.assertEqual(self.step("A")["state"], "invalidated")
+                    self.assertFalse(workflow.status(self.root)["release_ready"])
+
+    def test_recovery_proof_modified_after_resume_cannot_support_new_work(self) -> None:
+        self.generate()
+        self.run_action("fail", record=self.badcase())
+        self.run_action("resume", resolution=self.recovery())
+        (self.root / "proofs/previous_success.txt").write_text("synthetic changed result", encoding="utf-8")
+        with self.assertRaisesRegex(evidence.GateError, "dependencies_changed"):
+            self.generate()
+
+    def test_original_failure_proof_is_checked_before_failure_can_be_resumed(self) -> None:
+        self.generate()
+        self.run_action("fail", record=self.badcase())
+        resolution = self.recovery()
+        (self.root / "proofs/failure.txt").unlink()
+        with self.assertRaises(evidence.GateError):
+            self.run_action("resume", resolution=resolution)
+        self.assertEqual(self.step("A")["state"], "blocked")
 
     def test_failure_flows_to_earliest_step_with_version_bound_badcase(self) -> None:
         for step in "AB":
@@ -355,6 +468,53 @@ class WorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(evidence.GateError, "workflow_busy"):
             self.run_action("pause", reason="pause")
         self.assertEqual(self.job.read_bytes(), before)
+
+    def test_new_publication_receipt_during_gate_prevents_state_commit(self) -> None:
+        for kind in ("attempt", "result"):
+            with self.subTest(kind=kind):
+                self.prepare_job(Path(self.temporary.name) / f"receipt-{kind}")
+                self.generate()
+                before = self.job.read_bytes()
+                original_apply = workflow.apply
+                def receipt_created_after_apply(*args, **kwargs):
+                    original_apply(*args, **kwargs)
+                    self.file(f"H-publish/{kind}.json", "synthetic receipt; no publishing")
+                with patch.object(workflow, "apply", side_effect=receipt_created_after_apply):
+                    with self.assertRaisesRegex(evidence.GateError, "publication_read_only"):
+                        self.accept()
+                self.assertEqual(self.job.read_bytes(), before)
+                self.assertEqual(self.step("A")["state"], "generated")
+                self.assertTrue(workflow.status(self.root)["read_only"])
+
+    def test_shared_job_lock_excludes_workflow_and_future_receipt_writers(self) -> None:
+        before = self.job.read_bytes()
+        with workflow.locked(self.root):
+            with self.assertRaisesRegex(evidence.GateError, "workflow_busy"):
+                self.run_action("start", manifest="unused.json")
+        self.assertEqual(self.job.read_bytes(), before)
+        self.assertFalse((self.root / ".workflow.lock").exists())
+
+    def test_receipt_created_at_save_boundary_also_blocks_invalidation_writes(self) -> None:
+        for action in ("accept", "invalidate"):
+            with self.subTest(action=action):
+                self.prepare_job(Path(self.temporary.name) / f"save-{action}")
+                self.generate()
+                if action == "invalidate":
+                    self.accept()
+                    (self.root / "inputs/A-source_full.txt").write_text("synthetic input change", encoding="utf-8")
+                before = self.job.read_bytes()
+                original_save = workflow.save
+                def receipt_created_before_save(*args, **kwargs):
+                    self.file("H-publish/attempt.json", "synthetic receipt; no publishing")
+                    original_save(*args, **kwargs)
+                with patch.object(workflow, "save", side_effect=receipt_created_before_save):
+                    with self.assertRaisesRegex(evidence.GateError, "publication_read_only"):
+                        if action == "accept":
+                            self.accept()
+                        else:
+                            self.run_action("start", "B", manifest="unused.json")
+                self.assertEqual(self.job.read_bytes(), before)
+                self.assertTrue(workflow.status(self.root)["read_only"])
 
     def test_cli_only_outputs_safe_state_summary(self) -> None:
         result = subprocess.run([sys.executable, str(workflow.ROOT / "scripts/workflow.py"),

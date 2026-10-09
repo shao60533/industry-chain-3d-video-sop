@@ -24,6 +24,8 @@
 
 content_kind与visual_style不得在适配器硬绑定。相同研究/脚本/音轨/最终验收接口下，3D保留原生模型、装配、功能焦点和开场动作；白板使用可编辑二维工程、visual_inventory、图表口径/尺度、箭头关系与渐进揭示。12项槽名兼容，按画风输出实际适用检查，不能把整项N/A。第三方工具接入必须绑定版本与实际SHA，在途任务不可静默换实现。
 
+执行授权原件自动成为步骤输入依赖；恢复须保留活动recovery及原badcase.artifacts/回归原件，不能只留历史passed。未来publisher与Workflow共用workflow.locked(job_root)的`.workflow.lock`，先账号publisher锁后job锁，所有本地提交标记/回执写入遵守同一临界区。核心保存前再查attempt/result；完整平台实现与真实并发提交尚未验证。
+
 ## 配置顺序
 
 1. 创建本地 job 目录，按 A-reference、B-script、C-design、D-audio、E-model、F-film、G-package、H-publish 分阶段保存产物。

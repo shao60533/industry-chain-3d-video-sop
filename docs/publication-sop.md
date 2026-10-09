@@ -26,6 +26,8 @@
 
 正式执行走自行配置的发布入口与共享publisher锁；不抢锁、不杀其他会话。显式 `ZENITH_PUBLISH_SETTINGS_SOURCE` 必须绝对普通文件路径，优先于默认；指定路径无效应在停web前报错，不静默换配置。runtime覆盖最后加载；实际provider/model从运行证据验证，不照抄历史模型名。
 
+同一job的本地状态/marker/attempt/result写入必须与Workflow共用`.workflow.lock`，使用`workflow.locked(job_root)`。固定先取平台/账号publisher锁，再取job共享锁；在冻结包读取/完整质量复查到claim attempt及回执持久化临界区持有共享锁，不用另一发布锁绕过。持锁期间不嵌套transition；锁不构成发布授权，完整质量/账号/单次提交门禁仍必需。Workflow在提交状态前复查新attempt/result，发现即拒绝写入。此为未来适配器的接入契约，本包未实现真实publisher，竞态测试不证明发生过重复发布。
+
 **用户可以同时操作其他浏览器或标签。** prepare/backend helper使用active:false，后续绑定真实draftId/native tabId/fingerprint/manifest SHA与新鲜心跳。不激活标签/窗口、不移动系统鼠标、不用当前页猜控制页。局部DOM正常focus可用于真实控件事件；旧原生hover与OS窗口定位不作正常依赖。登录/风控/验证码或结构不支持时保留原稿，返回具体阻断。
 
 ## 2. 冻结包
