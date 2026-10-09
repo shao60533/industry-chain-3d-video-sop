@@ -5,7 +5,7 @@
 | 本包工具 | 实际职责 |
 |---|---|
 | install.sh / install.ps1 / scripts/setup.py | 安装 Codex 技能、基础依赖、独立 Python 环境和中文字体 |
-| scripts/doctor.py | 验依赖与字形，实际 CPU 渲染、重开工程、编码与解码；不签发成片质量 |
+| scripts/doctor.py | 验依赖、实际中文像素与缺字，原始Cycles CPU渲染及像素、重开工程、编码与全解码；不签发GPU/降噪能力或成片质量 |
 | scripts/init_job.py | 建立新任务目录和 pending 模板，拒绝覆盖已有任务 |
 | scripts/workflow.py | job.json内的A–E版本准出、F产物登记、暂停/失败回流/有限恢复；不执行生成工具，不推进最终G/H |
 | scripts/evidence.py（由workflow命令调用） | 实际文件/报告/证明SHA、类型、身份、时间、声明覆盖与阻断字段的最小校验；始终不签发release_ready |

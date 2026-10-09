@@ -36,6 +36,8 @@ curl -fsSL https://raw.githubusercontent.com/shao60533/industry-chain-3d-video-s
 
 安装器复用已有工具，自动补齐缺失依赖；不会索取 token、上传音色或配置平台账号。Windows PowerShell、离线工具配置、版本选择与权限说明见 [完整安装指南](docs/installation.md)。安装后在下一个 Codex 回合使用 **`$industry-chain-3d-video`**。
 
+doctor检查实际中文像素并拒绝缺字方框；最小CPU自检渲染原始Cycles画面，另验工程重开、编码与全解码。可保留自检产物供实际查看，具体命令见安装指南；环境ready不证明GPU、降噪或成片质量。
+
 ## 快速开始
 
 1. 打开 [Codex 工作流](docs/codex-workflow.md)，复制其中的启动任务，填入自己的产品、完整来源、品牌、工作目录与实际工具。

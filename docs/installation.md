@@ -39,7 +39,7 @@ Windows PowerShell：
 | FFmpeg / ffprobe | 复用可运行版本；缺失通过 Homebrew、apt 或 winget 安装，最后验证 H.264/AAC 实际能力 |
 | Pillow | 固定 12.3.0，仅安装在技能的 `.venv`，不修改系统 Python 包 |
 | 中文字体 | 固定 Noto Sans CJK SC 原件和 SHA，下载 OFL 许可到本地字体目录；可指定已有字体 |
-| 自检 | 中文字形、CPU 渲染、工程重开、24帧 H.264/AAC 编码、BT.709 标记与全解码 |
+| 自检 | 中文实际像素及缺字检查、原始Cycles CPU渲染及非空像素、工程重开、24帧 H.264/AAC 编码、BT.709 标记与全解码 |
 
 包管理器可能需要操作系统管理员权限。安装器不接收或保存管理员密码；没有权限时报告缺口。Homebrew 的初次安装需按其系统要求完成，Linux 非 root 用户可能收到正常 sudo 提示。Windows 的 FFmpeg/Python 安装依赖 App Installer（winget）。
 
@@ -64,6 +64,8 @@ Windows 对应参数为 `-Dest ./local-skill -SkipSystemDeps`、`-DryRun`。默�
 
 可通过本地环境变量指定工具文件：`VIDEO_SOP_PYTHON`、`VIDEO_SOP_BLENDER`、`VIDEO_SOP_FFMPEG`、`VIDEO_SOP_FFPROBE`、`VIDEO_SOP_FONT`。变量取文件路径，不填密钥；不需要公开配置。
 
+doctor直接读取`VIDEO_SOP_FONT`，优先于`.local/environment.json`里的font；未指定时仍用安装器固定字体。TTC/OTC集合可另设从0开始的`VIDEO_SOP_FONT_INDEX`，或在本地配置保存font_index。字体或索引无效会失败，不静默换字体。该索引用于doctor选择实际字形；制作工具也须显式选择和绑定自己的实际字体版本。
+
 重复安装会更新本安装器管理的文件，保留 `.venv`、`.local` 和自己的生产任务。未知目录和符号链接不会被直接覆盖；不用通过删除其他技能来解决冲突。
 
 在途任务另锁Workflow实现/规范的policy_sha256；安装更新不会改旧job或迁移旧批准。需继续在途任务时使用原固定提交/技能副本，不能编辑pin绕过。新任务使用新规范，见[统一Workflow](codex-workflow.md)。状态/证据核心只需Python标准库，可先验证代码；基础渲染自检与真实成片验收仍分开。
@@ -87,3 +89,13 @@ Windows 对应参数为 `-Dest ./local-skill -SkipSystemDeps`、`-DryRun`。默�
 Windows 把 `.venv/bin/python` 换成 `.venv\Scripts\python.exe`。新目录默认 `produce_only`，原始来源、音色、账号和验收由本次任务实际填写；不会发布。
 
 本机可执行文件与字体的绝对路径只保存在 `.local/environment.json`；`.local/doctor.json` 是不含私人路径的摘要。两个目录和生产任务均被忽略，不推送公开仓库。环境自检通过不等于成片验收通过，GPU、配音服务、对齐工具与发布适配需要本次任务另行配置和验证。
+
+## 查看自检的真实输出
+
+```bash
+.venv/bin/python scripts/doctor.py --smoke-test --artifacts-dir .local/doctor-artifacts/run-001 --out .local/doctor.json
+```
+
+证据目录必须全新，已有目录不会覆盖。保留font.png、64×64 frame.png、smoke.blend和24帧smoke.mp4；应实际打开中文图和CPU帧。摘要记录字体/像素/产物SHA，原件留在忽略目录。未指定`--artifacts-dir`时使用临时目录，验证后清理。
+
+字体检查实际绘制“产业链、中文数字、亿元、帧”等样本文字，逐个排除缺字方框并量像素墨迹；它只证明这组字形，不替代成片全帧glyph检查。CPU探针显式关闭降噪，验证原始Cycles渲染；某些构建缺OpenImageDenoise时仍可完成该基础渲染。报告明确记录denoising为disabled_for_minimal_cpu_probe、GPU为not_tested；生产需要的降噪、GPU与画面品质须另做真实验证，不能继承ready。

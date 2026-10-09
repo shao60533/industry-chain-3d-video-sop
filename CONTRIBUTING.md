@@ -6,4 +6,6 @@
 
 提交前检查 Markdown 链接和 JSON 语法，保持报告 schema 的兼容性。示例必须明确标为示例，所有待验字段保持 pending/null/false；不得复制真实验收为通用通过证明。
 
+代码回归使用`python -m unittest discover -s tests -v`；完整测试需在独立环境安装requirements.txt固定的Pillow以核像素，CI执行同一命令。实际doctor渲染与中文图查看另按[安装指南](docs/installation.md#查看自检的真实输出)，不能由合成测试代替。
+
 请勿提交密钥、登录状态、私人录音、私人对话、后台回执、账号 ID、个人绝对路径或无权公开的图片与原稿。
