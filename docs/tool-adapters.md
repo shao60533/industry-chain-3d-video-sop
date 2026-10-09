@@ -1,12 +1,14 @@
 # 工具适配说明
 
-本仓库已提供统一安装器、环境检测与任务初始化工具；原内部完整制作/发布运行器未分发。先按[安装指南](installation.md)准备基础工具链，再对接具体任务所需能力。
+本仓库已提供安装、自检、任务初始化及本地Workflow/证据最小核心；完整制作、checker和发布运行器未分发。以[统一规范](codex-workflow.md)和唯一job.json为入口，按[安装指南](installation.md)准备基础工具链，再对接具体能力。
 
 | 本包工具 | 实际职责 |
 |---|---|
 | install.sh / install.ps1 / scripts/setup.py | 安装 Codex 技能、基础依赖、独立 Python 环境和中文字体 |
-| scripts/doctor.py | 验依赖与字形，实际 CPU 渲染、重开工程、编码与解码；不签发成片质量 |
+| scripts/doctor.py | 验依赖、实际中文像素与缺字，原始Cycles CPU渲染及像素、重开工程、编码与全解码；不签发GPU/降噪能力或成片质量 |
 | scripts/init_job.py | 建立新任务目录和 pending 模板，拒绝覆盖已有任务 |
+| scripts/workflow.py | job.json内的A–E版本准出、F产物登记、暂停/失败回流/有限恢复；不执行生成工具，不推进最终G/H |
+| scripts/evidence.py（由workflow命令调用） | 实际文件/报告/证明SHA、类型、身份、时间、声明覆盖与阻断字段的最小校验；始终不签发release_ready |
 
 | 原系统名称 | 需要实现或人工完成的责任 |
 |---|---|
@@ -16,14 +18,20 @@
 | video_publisher_run.py | 先验质量，再核授权并调度具体平台发布适配器 |
 | xhs_video_prepare/status/fill/cover/verify/publish | 绑定唯一原稿、真实控件回读、单次提交、后台只读核验 |
 | active registry / archive-publication-records.py | 维护当前包、原始 attempt/result 和未知记录，归档失败不重发 |
-| Codex | 主执行者，贯穿规划、实现、调度、修复和证据整理；实际独立复核与自检分开记录 |
+| Codex / Agent | 当前步骤内部的推理、实现、调度、修复和证据整理；跨步骤推进交给同一Workflow，实际独立复核与自检分开 |
+
+`check-release-bindings`不是video_acceptance.py或video_publish_preflight.py的完整替代。它只验证所提交证据的结构与版本，未实现全帧glyph/focus重算、完整组件分类、PNG尺寸、播放覆盖或最终ffprobe，也不证明事实/听看/审美真实。外部checker尚未接入时F/G/H与对应领域检查保持pending，不可因该命令退出0启动publisher。
+
+content_kind与visual_style不得在适配器硬绑定。相同研究/脚本/音轨/最终验收接口下，3D保留原生模型、装配、功能焦点和开场动作；白板使用可编辑二维工程、visual_inventory、图表口径/尺度、箭头关系与渐进揭示。12项槽名兼容，按画风输出实际适用检查，不能把整项N/A。第三方工具接入必须绑定版本与实际SHA，在途任务不可静默换实现。
+
+执行授权原件自动成为步骤输入依赖；恢复须保留活动recovery及原badcase.artifacts/回归原件，不能只留历史passed。未来publisher与Workflow共用workflow.locked(job_root)的`.workflow.lock`，先账号publisher锁后job锁，所有本地提交标记/回执写入遵守同一临界区。核心保存前再查attempt/result；完整平台实现与真实并发提交尚未验证。
 
 ## 配置顺序
 
 1. 创建本地 job 目录，按 A-reference、B-script、C-design、D-audio、E-model、F-film、G-package、H-publish 分阶段保存产物。
-2. 填自己的完整来源、账号、品牌、字体文件和获授权音色。音色文件只在本地引用；不要提交到公开仓库。
+2. 独立填content_kind/visual_style、修订、制作者、完整来源、品牌、字体和获授权音色；平台账号只在实际授权发布时本地配置。成本/权限依据未知时阻塞，核心不增加付费调用。音色仅本地引用，不提交公开仓库。
 3. 复制布局 profile 并记录真实文件 SHA。使用最终实际字体测量字形墨迹，输出连续帧日志；不能只填矩形或场景名字。
-4. 在 production-spec 写实际章节、镜头、公司、组件、字幕和焦点窗口。报告以真实观察和原件 SHA 为依据，缺失保持 pending。
+4. 先关键帧/试听/难例并保存版本批准；按镜头记录production_method，不强制图生视频。数字/单位/字幕独立确定性合成，禁用可辨识人物头像。spec写实际章节、镜头、公司、适用视觉元素、字幕/焦点及layout绑定；typed报告绑定spec_sha256与全依赖，缺失保持pending。
 5. 检查最终 MP4 的解码、时间线、颜色、听感和连续运动，并在真实设备查看正常播放界面。
 6. 平台实现先验证只读与草稿行为，再在明确授权范围内测试提交。页面变化须重新验证；历史内部测试不算当前平台验证。
 

@@ -4,6 +4,7 @@
   "status": "pending",
   "job_id": null,
   "revision_id": null,
+  "spec_sha256": null,
   "video_sha256": null,
   "profile_sha256": null,
   "bindings": {
@@ -17,6 +18,7 @@
     "cover": null,
     "title": null,
     "body": null,
+    "layout": null,
     "component_inventory": null
   },
   "checked_at": null,

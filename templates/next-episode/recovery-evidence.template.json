@@ -1,0 +1,8 @@
+{
+  "schema": "video-recovery-evidence-1",
+  "status": "pending",
+  "failure_sha256": null,
+  "condition": null,
+  "checked_at": null,
+  "tests": []
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "video-badcase-1",
+  "job_id": null,
+  "revision_id": null,
+  "step": null,
+  "config_sha256": null,
+  "policy_sha256": null,
+  "inputs": {},
+  "outputs": {},
+  "category": null,
+  "expected": null,
+  "actual": null,
+  "earliest_root_cause": null,
+  "missed_check": null,
+  "minimal_fix": null,
+  "regression_cases": ["original_failure", "previous_success"],
+  "recovery_condition": null,
+  "artifacts": []
+}

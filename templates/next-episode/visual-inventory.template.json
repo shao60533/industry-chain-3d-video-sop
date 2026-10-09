@@ -1,0 +1,12 @@
+{
+  "schema": "video-visual-inventory-1",
+  "status": "pending",
+  "job_id": null,
+  "revision_id": null,
+  "source_script_sha256": null,
+  "visual_project": {"path": null, "sha256": null},
+  "shot_plan": {"path": null, "sha256": null},
+  "elements": [],
+  "required_element_fields": ["id", "script_anchor", "source_refs", "shot_ids", "relations", "units_scale", "reveal_order", "visible_window"],
+  "note": "白板图示/图表的领域底稿，需实际语义/覆盖审核；不是3D组件清单，不把整项12报告改成N/A。"
+}

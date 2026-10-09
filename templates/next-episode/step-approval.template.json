@@ -1,0 +1,14 @@
+{
+  "schema": "video-step-approval-1",
+  "status": "pending",
+  "step": null,
+  "job_id": null,
+  "revision_id": null,
+  "config_sha256": null,
+  "policy_sha256": null,
+  "inputs": {},
+  "outputs": {},
+  "approved_at": null,
+  "approver": {"id": null, "role": null},
+  "basis": {"path": null, "sha256": null}
+}

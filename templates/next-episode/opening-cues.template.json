@@ -1,5 +1,6 @@
 {
   "fps": 24,
+  "applicable_visual_style": "3d",
   "intervals": "left_closed_right_open",
   "total_frames": 228,
   "status": "candidate_design_not_rendered_or_listened",

@@ -1,7 +1,7 @@
 interface:
-  display_name: "产业链 3D 视频"
-  short_description: "用 Codex 完成产业链读源、分件建模、动效与质量交付，附依赖安装和环境自检"
+  display_name: "视频 Workflow · 3D / 白板"
+  short_description: "统一研究与证据流程，独立选择内容题材和3D/白板画风，先关键帧与小样再全片"
   brand_color: "#5BD6DF"
-  default_prompt: "使用 $industry-chain-3d-video 检查制作环境，并按完整来源制作本期产业链 3D 视频的稿件与样片。"
+  default_prompt: "使用 $industry-chain-3d-video 按统一 Workflow 检查环境，独立明确本期题材和3D/白板画风，先完整读源、稿件、关键帧与小样，并凭版本证据推进。"
 policy:
   allow_implicit_invocation: true
