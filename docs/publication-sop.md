@@ -1,5 +1,9 @@
 # Codex 视频发布 SOP · 小红书适配
 
+## 2026-10-21 · 制作方法与证据更新
+
+后台能力、基础正文/话题序列、同草稿身份、临场设置补充和结果未知恢复见[发布复盘](production-lessons.md)。默认job约束background_only且不要求切窗口；实际适配器需自行实现并验证，仓库不分发专用平台扩展。短期活动名称、账号与个人偏好不写进通用模板。 核心继续只验证结构/覆盖/SHA，不签发release_ready。
+
 题材和画风共用本发布契约，唯一任务/状态源见[统一Workflow](codex-workflow.md)。generated、步骤accepted、发布就绪、submitted和public_verified含义独立。新增的check-release-bindings只验结构/SHA，不能替代完整质量preflight，不授予发布权，也没有本包发布运行器。
 
 > 本文规定 Codex 和适配器应执行的行为。文中的原内部程序/插件名称未随仓库分发，接入责任见[工具适配说明](tool-adapters.md)。

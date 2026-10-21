@@ -1,5 +1,11 @@
 # 系列视觉质量基准：光模块对标
 
+## 2026-10-21 · 制作方法与证据更新
+
+3D按[《奇点》方法](singularity-blender-production.md)组织预演、景别与主次，按[材质布光](material-lighting-calibration.md)定位塑料感。实际采用参考、装配、表面与观察路线一起看；不将水彩/on 2s/HDR自动套到工业产品。 核心继续只验证结构/覆盖/SHA，不签发release_ready。
+
+2026-10-11：建模真实性、运镜整体性和字幕排版按[工程节点](visual-quality-workflow.md)准出。官网参考必须映射到具体装配、维护与材料特征；正文沿同一产品的观察路线推进，允许有目的的停稳和匹配切镜，不加入横摆或模拟头晃。安全区内仍须独立验字幕中轴、字号和标题层级，不能用“无越界”替代可读性。
+
 产品材料/几何/装配对标用于3D画风；白板在同一Workflow核图表单位/尺度、图示关系、图例/阅读顺序、渐进揭示和信息层。封面裁切、文字核对、解释焦点和实际观看仍共用，纯白板不要求产品装配。范围见[统一规范](codex-workflow.md)。
 
 封面兼容ID按画风解释：白板product_readability检查主题/图示主体，material_hierarchy检查线条/填色/信息层级，cover_narrative检查本期问题或判断怎样被表达，不强制金属材质或产品拆解；benchmark_comparison和series_typography仍实际比较。以下产品对标细节用于3D版本。

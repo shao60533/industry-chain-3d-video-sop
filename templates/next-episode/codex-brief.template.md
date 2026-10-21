@@ -19,3 +19,7 @@
 Agent负责当前步骤内部执行；Workflow凭版本证据推进。先稿件、分镜关键帧、试听与难例批准，再全片；3D/白板按画风检查，按镜头选方法，不强制图生视频。数字/单位/字幕独立合成，禁用可辨识人物头像。自检记self_review，实听/连续播放/设备缺证据保持pending。失败记最早根因与回流/回归，私人原文、录音、凭证、平台状态与回执不提交公开仓库。
 
 执行入口：[Codex 工作流](../../docs/codex-workflow.md)。
+
+## 2026-10-21 · 制作方法与声音计划
+
+先按[制作复盘](../../docs/production-lessons.md)在既有film-plan/visual_contract填写主判断、空间/景别、动作/停稳、光材与标注。3D采用[《奇点》方法](../../docs/singularity-blender-production.md)，先低模全片预演、代表难镜lookdev，再精模/长渲染。按[语义配音](../../docs/speech-production.md)生成新的speech-plan.json，绑定当前稿件/音频/时点与逐段真实审听证明后再作为D输出登记；E和最终报告保留拼接连听。模板保持pending，平台、账号和音色由本期自行配置。

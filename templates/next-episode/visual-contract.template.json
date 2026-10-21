@@ -1,0 +1,54 @@
+{
+  "schema": "video-visual-contract-1",
+  "status": "pending",
+  "job_id": null,
+  "revision_id": null,
+  "visual_style": null,
+  "bindings": {
+    "script": null,
+    "font": null,
+    "profile": null,
+    "keyframes": null,
+    "shot_plan": null,
+    "design_lock": null
+  },
+  "typography": {
+    "caption_alignment": "canvas_center",
+    "caption_center_tolerance_px": 2,
+    "caption_min_font_size": 56,
+    "caption_max_ink_width": 672,
+    "caption_max_lines": 2,
+    "caption_background": "transparent",
+    "header_min_ink_y": 160
+  },
+  "layout_proofs": [],
+  "product_references": [],
+  "product_reference_fields": [
+    "component_id",
+    "source_kind",
+    "source_locator",
+    "source_asset",
+    "reference_review",
+    "applied_features",
+    "claim_boundary",
+    "model_comparison"
+  ],
+  "camera_route": [],
+  "camera_route_fields": [
+    "shot_id",
+    "previous_shot_id",
+    "observation_goal",
+    "focus_component",
+    "strategy",
+    "movement_reason",
+    "settle_reason",
+    "handoff_reason",
+    "decorative_lateral_oscillation",
+    "route_proof"
+  ],
+  "note": "C必需输出visual_contract。路径/SHA引用真实本期文件；typography逐项与profile相等。产品依据与路线按3D适用；白板仍验排版及原图示条件。空模板不是证据；locked不代替实际观察或批准。",
+  "spoken_product_callouts": {
+    "path": null,
+    "sha256": null
+  }
+}

@@ -51,6 +51,8 @@ class EvidenceTests(unittest.TestCase):
                 "content_kind": job["content_kind"], "visual_style": style,
                 "media": {"frames": 24}, "bindings": self.bindings,
                 "requirements": {name: [f"synthetic-{name}"] for name in evidence.CHECKS}}
+        for name, ids in evidence.visual_node_requirements(style).items():
+            spec['requirements'][name].extend(ids)
         spec_ref = self.write(self.base / "production-spec.json", spec)
         proof = self.data_ref("proof.txt")
         checks = {}
@@ -69,6 +71,8 @@ class EvidenceTests(unittest.TestCase):
                 "results": {key: True for key in ("full_decode", "constant_pts", "frame_count", "audio_sync",
                     "black_scan", "color_range_matrix", "input_format_uniform", "encoded_boundary_comparison")},
                 "frames_scanned": 24, "device": {"actual_platform_playback": True}}
+            report['observations'] = [{"id": item, "status": "passed", "detail": "synthetic fixture only",
+                                       "artifacts": [proof]} for item in spec['requirements'][name]]
             checks[name] = {"status": "passed", "report": self.write(self.base / f"{name}.json", report)}
         self.acceptance = {"schema": "video-release-evidence-2.2", "job_id": job["job_id"],
                            "revision_id": job["revision_id"], "video_sha256": self.video_hash,
@@ -100,6 +104,7 @@ class EvidenceTests(unittest.TestCase):
         (self.base / "cover_crop.json").unlink()
         with self.assertRaises(evidence.GateError):
             self.check()
+
         self.fixture("3d")
         self.acceptance["checks"]["cover_crop"]["status"] = "pending"
         self.write(self.base / "acceptance.json", self.acceptance)
@@ -109,6 +114,43 @@ class EvidenceTests(unittest.TestCase):
         self.edit_report("cover_crop", "status", "pending")
         with self.assertRaisesRegex(evidence.GateError, "report_not_passed"):
             self.check()
+
+    def test_visual_conditions_cannot_be_removed_from_spec(self) -> None:
+        spec = evidence.load_json(self.base / 'production-spec.json')
+        spec['requirements']['dynamic_playback'].remove('camera_continuity')
+        self.acceptance['spec'] = self.write(self.base / 'production-spec.json', spec)
+        self.write(self.base / 'acceptance.json', self.acceptance)
+        with self.assertRaisesRegex(evidence.GateError, 'visual_node_requirements_missing'):
+            self.check()
+
+    def test_final_audio_review_cannot_drop_prosody_or_join_observations(self) -> None:
+        required = ("semantic_phrase_boundaries", "paragraph_prosody_listening", "narration_join_continuity")
+        for style in ("3d", "whiteboard"):
+            for missing in required:
+                with self.subTest(style=style, missing=missing):
+                    self.fixture(style)
+                    spec = evidence.load_json(self.base / "production-spec.json")
+                    for item in required:
+                        if item != missing and item not in spec["requirements"]["voice_music_listening"]:
+                            spec["requirements"]["voice_music_listening"].append(item)
+                    spec["requirements"]["voice_music_listening"] = [
+                        item for item in spec["requirements"]["voice_music_listening"] if item != missing
+                    ]
+                    self.acceptance["spec"] = self.write(self.base / "production-spec.json", spec)
+                    for name in evidence.CHECKS:
+                        path = self.base / f"{name}.json"
+                        report = evidence.load_json(path)
+                        report["spec_sha256"] = self.acceptance["spec"]["sha256"]
+                        if name == "voice_music_listening":
+                            proof = self.data_ref("synthetic-listening.txt")
+                            report["observations"] = [
+                                {"id": item, "status": "passed", "detail": "synthetic fixture only", "artifacts": [proof]}
+                                for item in spec["requirements"][name]
+                            ]
+                        self.acceptance["checks"][name]["report"] = self.write(path, report)
+                    self.write(self.base / "acceptance.json", self.acceptance)
+                    with self.assertRaisesRegex(evidence.GateError, "visual_node_requirements_missing"):
+                        self.check()
 
     def test_input_and_media_changes_invalidate_their_previous_sha(self) -> None:
         (self.base / "script.txt").write_text("modified source", encoding="utf-8")

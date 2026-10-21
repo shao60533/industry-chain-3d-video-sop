@@ -1,0 +1,21 @@
+{
+  "schema": "spoken-product-callouts-1",
+  "status": "pending",
+  "job_id": null,
+  "revision_id": null,
+  "script_sha256": null,
+  "callouts": [],
+  "callout_fields": [
+    "id",
+    "script_anchor",
+    "label_text",
+    "anchor_key",
+    "representation",
+    "semantic_nodes",
+    "start_frame",
+    "end_frame",
+    "shot_ids",
+    "exit_condition"
+  ],
+  "note": "C声明完整技术解释窗口及真实节点；D完成词对齐后更新时点/版本，E检查原生点实际可见与最终引线跟随。空模板不能准出，diagram不冒充实体。"
+}

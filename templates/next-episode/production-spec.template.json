@@ -73,13 +73,33 @@
     "source_script": [],
     "company_judgments": [],
     "voice_identity": [],
-    "model_coverage": [],
+    "model_coverage": [
+      "product_reference_application",
+      "product_realism_states",
+      "spoken_product_identification"
+    ],
     "opening_motion_rhythm": [],
     "technical": [],
-    "layout_geometry": [],
-    "encoded_masked_review": [],
-    "dynamic_playback": [],
-    "voice_music_listening": [],
+    "layout_geometry": [
+      "caption_center_readability",
+      "header_hierarchy",
+      "caption_word_integrity",
+      "callout_anchor_and_gap"
+    ],
+    "encoded_masked_review": [
+      "typography_encoded_readability",
+      "callout_phone_readability"
+    ],
+    "dynamic_playback": [
+      "camera_continuity",
+      "camera_motion_purpose",
+      "callout_tracking_and_handoff"
+    ],
+    "voice_music_listening": [
+      "semantic_phrase_boundaries",
+      "paragraph_prosody_listening",
+      "narration_join_continuity"
+    ],
     "real_device_overlay": [],
     "cover_crop": [
       "9:16",

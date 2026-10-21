@@ -1,5 +1,11 @@
 # 一条视频 Workflow：内容与画风独立
 
+## 2026-10-21 · 制作方法与证据更新
+
+本轮[制作复盘](production-lessons.md)扩展现有C/D/E及12项证据。D新增speech_plan必需输出与语义审听条件；新方法文档和代码一起进入policy_sha256。在途工程不自动改pin；H阶段卡只列外部平台适配义务，不代表已提供发布实现。 核心继续只验证结构/覆盖/SHA，不签发release_ready。
+
+2026-10-11新增[视觉质量节点](visual-quality-workflow.md)。继续只用job.json状态，新增C必需输出visual_contract及C/E固定观察。`workflow.py --job <目录> card`只读生成当前阶段执行卡。参考、路径证明或排版绑定变化回流C并使后续依赖失效；最终12项报告保留新增最低观察，核心仍不签发release_ready。
+
 workflow-1，2026-10-09。本文件是统一规范入口，`job.json` 是唯一任务与持久状态来源。制作、验收和发布文档是同一 Workflow 的领域契约；不另外安装总控或维护第二份任务台账。原 A–H 和 Q-A–Q-E 保留。
 
 Agent 负责当前步骤内的推理、工具调用、产物和修复。Workflow 负责步骤之间的状态推进、准出、证据、失败回流与暂停恢复。Agent 的“完成了”不是状态转换凭据。
@@ -35,7 +41,7 @@ Agent 负责当前步骤内的推理、工具调用、产物和修复。Workflow
 | A 研究 | 指定完整来源、brief、来源映射、研究笔记 | 全文范围、事实/单位/日期、缺口与时长/集数预算 |
 | B 脚本 | 唯一确认稿、公司判断、问答映射和同源导出 | Q-A；本题材的明确观点与来源依据，不只匹配关键词 |
 | C 设计 | 分镜关键帧、shot-plan、design-lock、字体与布局 | Q-B 前置；关键帧批准绑定输入及具体输出版本 |
-| D 音轨 | 30–60秒试听、最终音轨、timing、字幕 | 音色、数字/专名、语速和同步；试听批准只覆盖该版本 |
+| D 音轨 | 30–60秒试听、最终音轨、timing、字幕、speech_plan | 音色、数字/专名、语速和同步；试听批准只覆盖该版本 |
 | E 视觉/小样 | 可编辑视觉工程、开场和15–30秒正文难例 | Q-B；连续听看与批准，包含两行字幕、卡片、数字及焦点 |
 | F 全片 | 最终媒体、layout、技术与感知报告 | Q-C/Q-D；真实完整 checker 与听看/设备检查 |
 | G 冻结 | 同版 spec、12项报告、全发布资产 manifest | Q-E；完整验收和当前依赖均有效才能发布就绪 |
@@ -103,8 +109,8 @@ python3 scripts/workflow.py --job ./jobs/episode resume --step B
 |---|---|---|
 | A | source_full、brief | source_map、research_notes |
 | B | source_full、brief | script、company_judgments、question_answers |
-| C | script、font、profile | keyframes、shot_plan、design_lock |
-| D | script、voice_reference | voice_preview、audio、timing、captions |
+| C | script、font、profile | keyframes、shot_plan、design_lock、visual_contract |
+| D | script、voice_reference | voice_preview、audio、timing、captions、speech_plan |
 | E | script、shot_plan、audio、timing、font、profile | visual_project、opening_sample、difficult_sample |
 | F | 同E，加 visual_project | video、layout |
 
@@ -162,6 +168,6 @@ jobs/<job-id>/ 保留 A-reference、B-script、C-design、D-audio、E-model、F-
 - [Spec Kit](https://github.com/github/spec-kit)及其[Workflow文档](https://github.github.io/spec-kit/reference/workflows.html)：规范→计划→任务→实现/收敛，以及持久状态、条件、关口和暂停恢复。当前已提供 Workflow 引擎，不能说它没有状态机。
 - [Matt Pocock skills](https://github.com/mattpocock/skills)：需求术语、端到端任务和测试审查的小型可组合技能。
 - [Superpowers](https://github.com/obra/superpowers)：先找根因、用失败回归驱动修复、完成声明前获得新证据。
-- [Treeloop作者方法文](https://blog.51cto.com/aioldsix/14909117)：作为方法论线索；本次页面读取未成功，未核实可执行框架，不宣称安装或运行。
+- [Treeloop作者方法文](https://blog.51cto.com/aioldsix/14909117)：2026-10-11搜索索引读取到阶段/条件/回流/过程/证据/执行卡分工，原页面仍打开超时。以此参考补本项目视觉节点，不宣称安装其框架、复制代码或全文核读。
 
 这里只借鉴机制，不执行或整套安装上游，不复制上游代码/大段文字。若后续实质复用 MIT 内容，保留对应版权、许可和来源。规则更新、代码验证、真实样片、全片验收和发布效果分别记录。
