@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 
@@ -24,6 +25,19 @@ CHECK_CAPABILITIES = {
     "real_device_overlay": {"actual_device"}, "cover_crop": {"view_images"}}
 
 
+def visual_node_requirements(style: str) -> dict[str, list[str]]:
+    result = {"layout_geometry": ["caption_center_readability", "header_hierarchy", "caption_word_integrity"],
+              "encoded_masked_review": ["typography_encoded_readability"],
+              "voice_music_listening": ["semantic_phrase_boundaries", "paragraph_prosody_listening",
+                                        "narration_join_continuity"]}
+    if style == "3d":
+        result.update(model_coverage=["product_reference_application", "product_realism_states", "spoken_product_identification"],
+                      dynamic_playback=["camera_continuity", "camera_motion_purpose", "callout_tracking_and_handoff"])
+        result["layout_geometry"].append("callout_anchor_and_gap")
+        result["encoded_masked_review"].append("callout_phone_readability")
+    return result
+
+
 class GateError(ValueError):
     """A stable code keeps private file contents and paths off the console."""
 
@@ -35,6 +49,16 @@ def require(condition: bool, code: str) -> None:
 
 def nonempty(value: object) -> bool:
     return isinstance(value, str) and bool(value.strip())
+
+
+def finite_number(value: object) -> bool:
+    """Reject booleans, non-finite values, and integers too large for numeric checks."""
+    if type(value) not in (int, float):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
 
 
 def sha256(path: Path) -> str:
@@ -199,6 +223,9 @@ def check_release_bindings(root: Path, evidence_name: str, video_name: str, prof
     checks = acceptance.get("checks")
     require(isinstance(checks, dict) and set(checks) == set(CHECKS), "twelve_checks_required")
     require(isinstance(requirements, dict) and set(requirements) == set(CHECKS), "twelve_requirements_required")
+    for name, ids in visual_node_requirements(job['visual_style']).items():
+        require(isinstance(requirements[name], list) and set(ids) <= set(requirements[name]),
+                "visual_node_requirements_missing")
     report_paths = set()
     frames = spec.get("media", {}).get("frames") if isinstance(spec.get("media"), dict) else None
     require(type(frames) is int and frames > 0, "actual_frame_count_required")

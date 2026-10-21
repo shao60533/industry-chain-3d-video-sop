@@ -37,3 +37,10 @@ step-evidence / step-approval保存早期步骤证据及具体输入/输出版�
 2026-10-05：五项封面美术观察已进入production-spec.template.json的requirements.cover_crop，使用既有2.2覆盖校验。视觉底稿的观察和实际对照图引用到cover_crop，不新增第13项，也不把模板填满当通过。镜头按功能口播记录原生动作/末帧保持/静态与二维区间；结构过程和卡片段分别判断。
 
 script.template.md已补开场具体问题和结尾同序答案；company-judgments补产品分类、全链位置、公司比较结论；芯片基板与晶圆按可见功能分区、器件/互连和尺度核图。执行卡修的是既有流程的实际内容，不是另一套口播方法论。
+# 2026-10-11视觉节点
+
+先运行`workflow.py --job <目录> card`读取当前条件。C输出清单必须包含`visual_contract`：复制visual-contract.template.json，绑定实际参考采用、全部镜头观察路线和排版锁。E连续编码小样包含产品多姿态、实际交接、两行字幕/标题/保词难例；缺项或pending不得accept。详见[视觉节点](../../docs/visual-quality-workflow.md)。模板不是证据，不把已提交旧片迁移到新节点。
+
+## 2026-10-21 · 制作方法与声音计划
+
+先按[制作复盘](../../docs/production-lessons.md)在既有film-plan/visual_contract填写主判断、空间/景别、动作/停稳、光材与标注。3D采用[《奇点》方法](../../docs/singularity-blender-production.md)，先低模全片预演、代表难镜lookdev，再精模/长渲染。按[语义配音](../../docs/speech-production.md)生成新的speech-plan.json，绑定当前稿件/音频/时点与逐段真实审听证明后再作为D输出登记；E和最终报告保留拼接连听。模板保持pending，平台、账号和音色由本期自行配置。

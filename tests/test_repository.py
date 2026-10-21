@@ -5,12 +5,15 @@ from pathlib import Path
 import re
 import sys
 import unittest
+import tempfile
+from unittest.mock import patch
 from urllib.parse import unquote
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import evidence
 import runtime
 import setup
+import workflow
 
 
 class RepositoryTests(unittest.TestCase):
@@ -62,6 +65,36 @@ class RepositoryTests(unittest.TestCase):
         self.assertLessEqual(len(description.group(1)), 1024)
         self.assertIn("scripts", setup.PAYLOAD)
         self.assertIn("tests", setup.PAYLOAD)
+
+    def test_new_method_documents_are_part_of_the_pinned_policy(self) -> None:
+        documents = ("docs/singularity-blender-production.md", "docs/material-lighting-calibration.md",
+                     "docs/production-lessons.md", "docs/speech-production.md")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in workflow.POLICY_FILES:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("original synthetic policy", encoding="utf-8")
+            with patch.object(workflow, "ROOT", root):
+                original = workflow.policy_sha256()
+                for name in documents:
+                    with self.subTest(document=name):
+                        self.assertIn(name, workflow.POLICY_FILES)
+                        path = root / name
+                        path.write_text("changed synthetic policy", encoding="utf-8")
+                        self.assertNotEqual(workflow.policy_sha256(), original)
+                        path.write_text("original synthetic policy", encoding="utf-8")
+
+    def test_public_documents_and_templates_exclude_private_machine_paths(self) -> None:
+        documents = self.documents() + list((runtime.ROOT / "templates").rglob("*.json"))
+        for path in documents:
+            text = path.read_text(encoding="utf-8")
+            self.assertIsNone(re.search(r"/Users/[^/\s]+/|/home/[^/\s]+/|[A-Za-z]:[\\/]+Users[\\/]+", text),
+                              f"Private machine path in {path.name}")
+        job = evidence.load_json(runtime.ROOT / "templates/next-episode/job.template.json")
+        self.assertIsNone(job["expected_account"])
+        self.assertIsNone(job["voice_lock"]["reference_audio"])
+        self.assertIsNone(job["voice_lock"]["reference_audio_sha256"])
 
 
 if __name__ == "__main__":

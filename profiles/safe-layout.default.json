@@ -1,5 +1,5 @@
 {
-  "id": "xhs-conservative-1080x1920-v2",
+  "id": "xhs-conservative-1080x1920-v3",
   "canvas": [
     1080,
     1920
@@ -53,7 +53,7 @@
     880,
     1350
   ],
-  "caption_min_font_size": 42,
+  "caption_min_font_size": 56,
   "caption_max_lines": 2,
   "card_caption_gap": 24,
   "review_phone_widths": [
@@ -81,5 +81,10 @@
       ],
       "reason": "非关键信息字标；不豁免标题、字幕、数字或功能焦点"
     }
-  ]
+  ],
+  "caption_alignment": "canvas_center",
+  "caption_center_tolerance_px": 2,
+  "caption_max_ink_width": 672,
+  "caption_background": "transparent",
+  "header_min_ink_y": 160
 }

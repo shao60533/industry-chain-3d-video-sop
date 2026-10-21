@@ -72,5 +72,11 @@
     "spec": "G-package/production-spec.json",
     "report_template": "check-report.template.json"
   },
-  "revision_id": null
+  "revision_id": null,
+  "speech_plan": "D-audio/speech-plan.json",
+  "publication_control": {
+    "mode": "background_only",
+    "native_fallback_allowed": false,
+    "user_window_switch_required": false
+  }
 }

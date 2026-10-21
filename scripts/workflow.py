@@ -13,6 +13,8 @@ import tempfile
 from evidence import (GateError, check_release_bindings, check_time, digest, file_path,
                       load_json, nonempty, observations, recheck, require, review, sha256, verify_ref)
 from runtime import ROOT
+from visual_contract import validate_visual_contract
+from speech_plan import validate_speech_plan
 
 VERSION = "video-workflow-1"
 STEPS = tuple("ABCDEFGH")
@@ -34,19 +36,21 @@ INPUT_PROVIDERS = {
 INPUT_PROVIDERS["F"] = {**INPUT_PROVIDERS["E"], "visual_project": ("E", "outputs", "visual_project")}
 OUTPUTS = {
     "A": {"source_map", "research_notes"}, "B": {"script", "company_judgments", "question_answers"},
-    "C": {"keyframes", "shot_plan", "design_lock"}, "D": {"voice_preview", "audio", "timing", "captions"},
+    "C": {"keyframes", "shot_plan", "design_lock", "visual_contract"}, "D": {"voice_preview", "audio", "timing", "captions", "speech_plan"},
     "E": {"visual_project", "opening_sample", "difficult_sample"}, "F": {"video", "layout"}}
-CAPABILITIES = {"A": {"read_source"}, "B": {"read_source", "read_script"}, "C": {"view_images"},
+CAPABILITIES = {"A": {"read_source"}, "B": {"read_source", "read_script"}, "C": {"view_images", "read_script"},
                 "D": {"listen_audio"}, "E": {"watch_video", "listen_audio", "view_images"}}
 BASE_REQUIREMENTS = {
     "A": ["complete_source", "facts_units_dates", "scope_budget"],
     "B": ["source_script", "company_judgments", "question_answers", "same_source_exports"],
-    "C": ["keyframes", "shot_methods", "deterministic_text", "no_recognizable_portraits", "font_layout"],
-    "D": ["voice_identity", "numbers_names", "audio_timing"],
-    "E": ["encoded_samples", "continuous_playback", "music_rhythm", "captions_focus", "masked_phone_sample"]}
+    "C": ["keyframes", "shot_methods", "deterministic_text", "no_recognizable_portraits", "font_layout", "typography_layout_lock"],
+    "D": ["voice_identity", "numbers_names", "audio_timing", "semantic_phrase_boundaries", "paragraph_prosody_listening"],
+    "E": ["encoded_samples", "continuous_playback", "music_rhythm", "captions_focus", "masked_phone_sample",
+          "caption_center_readability", "header_hierarchy", "caption_word_integrity", "narration_join_continuity"]}
 STYLE_REQUIREMENTS = {
-    "3d": {"C": ["assembly_reference", "functional_detail"],
-           "E": ["real_explosion", "real_orbit", "real_reassembly", "saved_project_reopened"]},
+    "3d": {"C": ["assembly_reference", "functional_detail", "product_reference_application", "camera_observation_route", "spoken_product_callout_plan"],
+           "E": ["real_explosion", "real_orbit", "real_reassembly", "saved_project_reopened",
+                 "product_realism_states", "camera_continuity", "camera_motion_purpose", "spoken_product_identification"]},
     "whiteboard": {"C": ["chart_units_scale", "diagram_relations", "diagram_read_order"],
                    "E": ["progressive_reveal", "diagram_continuity", "editable_visual_project"]}}
 RETURN_TO = {"fact_error": "A", "script_error": "B", "visual_error": "C",
@@ -54,7 +58,10 @@ RETURN_TO = {"fact_error": "A", "script_error": "B", "visual_error": "C",
 LOCAL_FAILURES = {"tool_error", "capability_missing", "cost_unknown", "permission_unknown"}
 POLICY_FILES = ("scripts/workflow.py", "scripts/evidence.py", "docs/codex-workflow.md",
                 "docs/production-sop.md", "docs/acceptance.md", "docs/publication-sop.md",
-                "docs/component-scope-contract.md", "docs/visual-quality.md")
+                "docs/component-scope-contract.md", "docs/visual-quality.md",
+                "scripts/visual_contract.py", "docs/visual-quality-workflow.md", "scripts/spoken_callouts.py", "scripts/speech_plan.py",
+                "docs/singularity-blender-production.md", "docs/material-lighting-calibration.md",
+                "docs/production-lessons.md", "docs/speech-production.md")
 
 
 def policy_sha256() -> str:
@@ -127,6 +134,30 @@ def status(root: Path) -> dict:
             "production_checks": "pending"}
 
 
+def card(root: Path) -> dict:
+    """Read-only stage card, derived from the single job state, never a new ledger."""
+    result = status(root)
+    job = read_job(root)
+    step = next((s for s in STEPS if result['steps'][s] != 'accepted'), 'H')
+    state = job['workflow']['steps'][step]
+    style = job.get('visual_style')
+    return {**result, 'current_step': step, 'state': result['steps'][step],
+            'conditions': requirements(step, style) if step in BASE_REQUIREMENTS and style in VISUAL_STYLES else
+                (['quality_preflight','effective_runtime_identity','live_background_worker_receiver','inactive_tab_readback',
+                  'same_draft_identity','final_form_settings','single_attempt','backend_receipt'] if step == 'H' else []),
+            'required_outputs': sorted(OUTPUTS.get(step, set())),
+            'blocking_reason': 'publication_read_only' if result['read_only'] else
+                ('policy_version_mismatch' if not result['policy_matches'] else
+                 ('dependencies_changed' if result['dependencies_stale'] else state.get('blocker'))),
+            'evidence_present': state.get('evidence') is not None,
+            'retry_count': state['retries'], 'retry_limit': 1,
+            'next_review': 'current_step_evidence' if step in BASE_REQUIREMENTS else 'external_checker_required',
+            'publication_control': {'mode':'background_only','native_fallback_allowed':False,
+                'user_window_switch_required':False,'capability_check':'configured_adapter_read_only_probe',
+                'unknown_outcome':'read_only_backend_reconcile'},
+            'writes_state': False}
+
+
 def execution_allowed(root: Path, job: dict, snapshot: dict[Path, str] | None = None) -> None:
     constraints = job.get("execution_constraints")
     require(isinstance(constraints, dict), "execution_constraints_required")
@@ -181,6 +212,10 @@ def validate_step(root: Path, job: dict, step: str, report_ref: dict) -> None:
     require(isinstance(scope, list) and all(nonempty(x) for x in scope) and set(required) <= set(scope),
             "scope_incomplete")
     observations(root, report, required, snapshot)
+    if step == "C":
+        validate_visual_contract(root, job, state, snapshot)
+    if step == "D":
+        validate_speech_plan(root, job, state, snapshot)
     if step in APPROVAL_STEPS:
         require(isinstance(report.get("approval"), dict), "approval_required")
         approval_path = verify_ref(root, report["approval"], snapshot=snapshot)
@@ -426,6 +461,7 @@ def main() -> int:
     parser.add_argument("--job", type=Path, required=True)
     commands = parser.add_subparsers(dest="action", required=True)
     commands.add_parser("status")
+    commands.add_parser("card")
     for action in ("start", "record", "accept", "pause", "fail", "resume"):
         command = commands.add_parser(action)
         command.add_argument("--step", choices=STEPS, required=True)
@@ -447,6 +483,8 @@ def main() -> int:
     try:
         if args.action == "status":
             result = status(args.job)
+        elif args.action == 'card':
+            result = card(args.job)
         elif args.action == "check-release-bindings":
             result = check_release_bindings(args.job, args.evidence, args.video, args.profile)
         else:

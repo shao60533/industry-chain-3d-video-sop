@@ -1,0 +1,9 @@
+{
+  "schema": "video-speech-plan-1",
+  "status": "pending",
+  "bindings": {"script_sha256": null, "audio_sha256": null, "timing_sha256": null},
+  "pause_policy": "semantic_target_minus_measured_existing_edge_silence",
+  "units": [],
+  "paragraph_listening": [],
+  "note": "以语义段落生成，数字单位和名词解释保护；逐段连听最终语速，实际证据不能以ASR或模板代替。"
+}

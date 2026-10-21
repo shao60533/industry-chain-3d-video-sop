@@ -20,6 +20,8 @@
 
 仓库提供可安装的 Codex 技能、依赖安装器、环境自检、任务初始化、持久步骤状态与证据绑定最小核心，以及 SOP、模板和示意素材。核心支持 A–E 本地准出、F 产物登记和12项报告的结构/SHA校验，始终不签发 release_ready；完整制作、checker 与发布运行器仍需按[适配说明](docs/tool-adapters.md)接入。
 
+本轮更新将[制作复盘](docs/production-lessons.md)接入原Workflow：C固定产品参考、观察路线、排版及产品同步标注；D增加语义配音计划和逐段听感证据；E及最终报告继续核连续性。3D制作新增[《奇点》方法手册](docs/singularity-blender-production.md)和[材质布光校准](docs/material-lighting-calibration.md)，从预演、功能建模一直到镜头合成与渲染。自动结构/版本检查和真实听看分别记录，实际验证范围见[verification](docs/verification.md)。
+
 ## 一键安装到 Codex
 
 **把下面这句发给 Codex 即可：**
@@ -42,7 +44,7 @@ doctor检查实际中文像素并拒绝缺字方框；最小CPU自检渲染原�
 
 1. 打开 [Codex 工作流](docs/codex-workflow.md)，复制其中的启动任务，填入自己的产品、完整来源、品牌、工作目录与实际工具。
 2. 用初始化工具建立新的本地 `jobs/<job-id>/`，独立填写 content_kind 和 visual_style，锁修订、制作者、来源与成本/权限依据。job.json 是唯一任务与状态来源，默认 produce_only/pending，拒绝覆盖。
-3. 先读完整来源、写具体判断和全期结构，再制作分镜关键帧、配音试听、开场与正文难例样片。3D 做整体/展开/内部图与装配动作；白板做图表/关系图及渐进揭示；批准绑定具体输入/输出 SHA。
+3. 先读完整来源、写具体判断和全期结构，再制作分镜关键帧、配音试听、开场与正文难例样片。3D先做低模预演、功能近景lookdev，再做整体/展开/内部图与装配动作；白板做图表/关系图及渐进揭示。配音按语义段落计划并逐段连听；批准绑定具体输入/输出 SHA。
 4. 样片达到要求后进入全片；按 [质量验收](docs/acceptance.md) 检查最终编码、声音、运动、布局和真实设备。
 5. 需要发布时按 [发布 SOP](docs/publication-sop.md) 核冻结资产、账号和实际授权，再通过自行验证的适配器单次提交。
 

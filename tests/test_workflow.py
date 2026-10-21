@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import copy
 import json
 from pathlib import Path
 import subprocess
@@ -60,9 +61,47 @@ class WorkflowTests(unittest.TestCase):
         inputs = {key: self.file(f"inputs/{step}-{key}.txt") for key in workflow.INPUTS[step]}
         for key, (provider, field, item) in workflow.INPUT_PROVIDERS.get(step, {}).items():
             inputs[key] = self.step(provider)[field][item]
+        if step == 'C':
+            inputs['profile'] = {'path': 'C-design/safe-layout.json',
+                                 'sha256': evidence.sha256(self.root / 'C-design/safe-layout.json')}
         self.write(self.root / "inputs.json", inputs)
         self.run_action("start", step, manifest="inputs.json")
         outputs = {key: self.file(f"outputs/{step}-{key}.txt") for key in workflow.OUTPUTS[step]}
+        if step == 'C':
+            self.write(self.root / outputs['shot_plan']['path'], {'frames':240,'shots':[{'shot_id':'synthetic-shot','start_frame':0,'end_frame':240}]})
+            outputs['shot_plan']['sha256'] = evidence.sha256(self.root / outputs['shot_plan']['path'])
+            profile = self.read(self.root / inputs['profile']['path'])
+            proof = self.file('proofs/visual-node.txt', 'synthetic node proof, not a real visual review')
+            contract = dict(schema='video-visual-contract-1', status='locked', job_id=self.read(self.job)['job_id'],
+                            revision_id=self.read(self.job)['revision_id'], visual_style=self.read(self.job)['visual_style'],
+                            bindings={k: inputs[k]['sha256'] for k in ('script', 'font', 'profile')},
+                            typography={k: profile[k] for k in ('caption_alignment', 'caption_center_tolerance_px',
+                                'caption_min_font_size', 'caption_max_ink_width', 'caption_max_lines', 'caption_background', 'header_min_ink_y')},
+                            layout_proofs=[proof], product_references=[dict(component_id='synthetic-part',
+                                source_kind='documented_principle', source_locator='synthetic fixture', applied_features=['synthetic feature'],
+                                claim_boundary='not real CAD', source_asset=proof, reference_review=proof, model_comparison=proof)],
+                            camera_route=[dict(shot_id='synthetic-shot', observation_goal='synthetic goal', focus_component='synthetic-part',
+                                movement_reason='synthetic movement', settle_reason='read fixture', strategy='approach_open_inspect',
+                                decorative_lateral_oscillation=False, previous_shot_id=None, handoff_reason='opening fixture', route_proof=proof)])
+            calls=dict(schema='spoken-product-callouts-1',status='planned_for_render',job_id=self.read(self.job)['job_id'],revision_id=self.read(self.job)['revision_id'],script_sha256=inputs['script']['sha256'],callouts=[dict(id='synthetic-cue',script_anchor='synthetic proof',label_text='Synthetic part',anchor_key='synthetic-part',representation='physical_product',semantic_nodes=['synthetic-node'],start_frame=24,end_frame=120,shot_ids=['synthetic-shot'],exit_condition='fixture end')])
+            self.write(self.root/'proofs/callouts.json',calls)
+            contract['spoken_product_callouts']={'path':'proofs/callouts.json','sha256':evidence.sha256(self.root/'proofs/callouts.json')}
+            contract['bindings'].update({k: outputs[k]['sha256'] for k in ('keyframes', 'shot_plan', 'design_lock')})
+            self.write(self.root / outputs['visual_contract']['path'], contract)
+            outputs['visual_contract']['sha256'] = evidence.sha256(self.root / outputs['visual_contract']['path'])
+        if step == 'D':
+            from speech_plan import plan
+            script = (self.root / inputs['script']['path']).read_text(encoding='utf-8')
+            speech = plan(script)
+            speech.update(status='reviewed', bindings=dict(script_sha256=inputs['script']['sha256'],
+                audio_sha256=outputs['audio']['sha256'],timing_sha256=outputs['timing']['sha256']))
+            for unit in speech['units']:
+                unit.update(boundary_review='passed',tempo_review='passed')
+            proof=self.file('proofs/synthetic-listening.txt','synthetic test proof, never a real listening approval')
+            speech['paragraph_listening']=[dict(paragraph_id=p,status='passed',continuous=True,start_seconds=i,end_seconds=i+1,evidence=proof)
+                for i,p in enumerate(dict.fromkeys(u['paragraph_id'] for u in speech['units']))]
+            self.write(self.root / outputs['speech_plan']['path'], speech)
+            outputs['speech_plan']['sha256']=evidence.sha256(self.root / outputs['speech_plan']['path'])
         self.write(self.root / "outputs.json", outputs)
         self.run_action("record", step, manifest="outputs.json")
 
@@ -109,6 +148,40 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(data["workflow"]["publication"]["status"], "not_submitted")
         self.assertFalse((self.root / "workflow.json").exists())
         self.assertFalse(data["acceptance"]["release_ready"])
+
+    def test_audio_prosody_pending_missing_paragraph_or_changed_audio_cannot_accept(self) -> None:
+        for step in 'ABC': self.generate(step); self.accept(step)
+        self.generate('D'); ref=self.step('D')['outputs']['speech_plan']; path=self.root/ref['path']
+        original=self.read(path)
+        for kind in ('pending','coverage','binding','continuous','infinite_window','false_paragraph','context','duplicate_listening','huge_window'):
+            value=copy.deepcopy(original)
+            if kind=='pending':value['units'][0]['boundary_review']='pending'
+            elif kind=='coverage':value['paragraph_listening']=[]
+            elif kind=='binding':value['bindings']['audio_sha256']='old-audio'
+            elif kind=='continuous':value['paragraph_listening'][0]['continuous']=False
+            elif kind=='infinite_window':value['paragraph_listening'][0]['end_seconds']=float('inf')
+            elif kind=='huge_window':value['paragraph_listening'][0]['end_seconds']=10**400
+            elif kind=='false_paragraph':
+                value['units'][0]['paragraph_id']='invented-paragraph'
+                value['paragraph_listening'][0]['paragraph_id']='invented-paragraph'
+            elif kind=='context':value['units'][0]['prior_context']='unrelated context'
+            elif kind=='duplicate_listening':value['paragraph_listening'].append(copy.deepcopy(value['paragraph_listening'][0]))
+            self.write(path,value);job=self.read(self.job)
+            job['workflow']['steps']['D']['outputs']['speech_plan']['sha256']=evidence.sha256(path);self.write(self.job,job)
+            with self.assertRaises(evidence.GateError):self.run_action('accept','D',report=self.report('D'))
+        self.write(path,original);job=self.read(self.job)
+        job['workflow']['steps']['D']['outputs']['speech_plan']['sha256']=evidence.sha256(path);self.write(self.job,job)
+        self.accept('D')
+
+    def test_card_uses_existing_state_and_is_read_only(self) -> None:
+        original = self.job.read_bytes()
+        result = workflow.card(self.root)
+        self.assertEqual(result['current_step'], 'A')
+        self.assertFalse(result['writes_state'])
+        self.assertEqual(self.job.read_bytes(), original)
+        self.assertFalse((self.root / 'workflow.json').exists())
+        self.generate(); self.accept()
+        self.assertEqual(workflow.card(self.root)['current_step'], 'B')
 
     def test_generated_requires_evidence_before_next_step_and_survives_reload(self) -> None:
         self.generate()
@@ -226,6 +299,109 @@ class WorkflowTests(unittest.TestCase):
         self.write(self.root / name, report)
         with self.assertRaisesRegex(evidence.GateError, "false_independent_review"):
             self.run_action("accept", report=name)
+
+    def test_visual_nodes_missing_or_pending_cannot_advance(self) -> None:
+        for step in 'AB':
+            self.generate(step); self.accept(step)
+        self.generate('C')
+        for change in ('missing', 'pending'):
+            name = self.report('C'); report = self.read(self.root / name)
+            if change == 'missing':
+                report['observations'] = [x for x in report['observations'] if x['id'] != 'typography_layout_lock']
+            else:
+                next(x for x in report['observations'] if x['id'] == 'typography_layout_lock')['status'] = 'pending'
+            self.write(self.root / name, report)
+            with self.assertRaises(evidence.GateError): self.run_action('accept', 'C', report=name)
+            self.assertEqual(self.step('C')['state'], 'generated')
+
+    def test_changed_nested_reference_invalidates_accepted_design(self) -> None:
+        job = self.read(self.job); job['visual_style'] = '3d'; self.write(self.job, job)
+        for step in 'ABC':
+            self.generate(step); self.accept(step)
+        (self.root / 'proofs/visual-node.txt').write_text('changed reference', encoding='utf-8')
+        self.assertTrue(workflow.status(self.root)['dependencies_stale'])
+
+    def test_decorative_camera_motion_is_rejected(self) -> None:
+        job = self.read(self.job); job['visual_style'] = '3d'; self.write(self.job, job)
+        for step in 'AB': self.generate(step); self.accept(step)
+        self.generate('C')
+        state = self.step('C'); ref = state['outputs']['visual_contract']; file = self.root / ref['path']
+        contract = self.read(file); contract['camera_route'][0]['decorative_lateral_oscillation'] = True
+        self.write(file, contract)
+        job = self.read(self.job); job['workflow']['steps']['C']['outputs']['visual_contract']['sha256'] = evidence.sha256(file)
+        self.write(self.job, job)
+        with self.assertRaisesRegex(evidence.GateError, 'camera_decorative_oscillation'):
+            self.run_action('accept', 'C', report=self.report('C'))
+
+    def prepare_callout_design(self):
+        job=self.read(self.job);job['visual_style']='3d';self.write(self.job,job)
+        for step in ['A','B']:
+            self.generate(step);self.accept(step)
+        self.generate('C')
+        return self.step('C'),self.read(self.job)
+
+    def test_missing_spoken_callout_plan_blocks_design(self):
+        from visual_contract import validate_visual_contract
+        state,job=self.prepare_callout_design();file=self.root/state['outputs']['visual_contract']['path'];data=self.read(file)
+        data.pop('spoken_product_callouts');self.write(file,data);state['outputs']['visual_contract']['sha256']=evidence.sha256(file)
+        with self.assertRaisesRegex(evidence.GateError,'spoken_callout_plan_missing'):
+            validate_visual_contract(self.root,job,state,{})
+
+    def test_bad_spoken_callout_mapping_blocks_design(self):
+        from visual_contract import validate_visual_contract
+        state,job=self.prepare_callout_design();file=self.root/state['outputs']['visual_contract']['path'];contract=self.read(file);ref=contract['spoken_product_callouts'];calls=self.root/ref['path'];original=self.read(calls)
+        mutations=[('source_anchor','spoken_callout_source_anchor_missing'),('wrong_shot','spoken_callout_shots_invalid'),('empty_nodes','spoken_callout_nodes_missing'),('bad_frame','spoken_callout_window_invalid'),('empty_labels','spoken_callout_label_missing'),('stale_script','spoken_callout_script_mismatch')]
+        for kind,error in mutations:
+            with self.subTest(kind=kind):
+                data=json.loads(json.dumps(original));cue=data['callouts'][0]
+                if kind=='source_anchor':cue['script_anchor']='never in the current source'
+                if kind=='wrong_shot':cue['shot_ids']=['unknown']
+                if kind=='empty_nodes':cue['semantic_nodes']=[]
+                if kind=='bad_frame':cue['start_frame']=True
+                if kind=='empty_labels':cue['label_text']=''
+                if kind=='stale_script':data['script_sha256']='0'*64
+                self.write(calls,data);contract['spoken_product_callouts']['sha256']=evidence.sha256(calls);self.write(file,contract);state['outputs']['visual_contract']['sha256']=evidence.sha256(file)
+                with self.assertRaisesRegex(evidence.GateError,error):validate_visual_contract(self.root,job,state,{})
+
+    def test_approved_callout_plan_change_invalidates_design(self):
+        self.prepare_callout_design();self.accept('C');file=self.root/'proofs/callouts.json';data=self.read(file);data['callouts'][0]['label_text']='Changed label';self.write(file,data)
+        status=workflow.status(self.root);self.assertTrue(status['dependencies_stale']);self.assertEqual(status['steps']['C'],'invalidated')
+
+    def test_visual_contract_missing_conditions_fail_closed(self) -> None:
+        from visual_contract import validate_visual_contract
+        job = self.read(self.job); job['visual_style'] = '3d'; self.write(self.job, job)
+        for step in 'AB': self.generate(step); self.accept(step)
+        self.generate('C')
+        job = self.read(self.job); state = job['workflow']['steps']['C']
+        file = self.root / state['outputs']['visual_contract']['path']; original = self.read(file)
+        cases = [('product_references', [], 'product_reference_missing'),
+                 ('camera_route', [], 'camera_route_coverage_missing'),
+                 ('layout_proofs', [], 'typography_proof_missing'),
+                 ('status', 'pending', 'visual_contract_not_locked')]
+        for key, value, error in cases:
+            with self.subTest(condition=key):
+                changed = dict(original, **{key: value}); self.write(file, changed)
+                state['outputs']['visual_contract']['sha256'] = evidence.sha256(file)
+                with self.assertRaisesRegex(evidence.GateError, error):
+                    validate_visual_contract(self.root, job, state, {})
+
+    def test_nonfinite_or_nonnumeric_profile_cannot_lock_design(self) -> None:
+        from visual_contract import validate_visual_contract
+        for step in 'AB': self.generate(step); self.accept(step)
+        self.generate('C')
+        job = self.read(self.job); state = job['workflow']['steps']['C']
+        file = self.root / state['outputs']['visual_contract']['path']; original = self.read(file)
+        profile_file = self.root / state['inputs']['profile']['path']; profile = self.read(profile_file)
+        for value in ('56', True, float('inf'), 10**400):
+            with self.subTest(value=value):
+                changed_profile = dict(profile, caption_min_font_size=value); self.write(profile_file, changed_profile)
+                state['inputs']['profile']['sha256'] = evidence.sha256(profile_file)
+                contract = copy.deepcopy(original)
+                contract['bindings']['profile'] = state['inputs']['profile']['sha256']
+                contract['typography']['caption_min_font_size'] = value; self.write(file, contract)
+                state['outputs']['visual_contract']['sha256'] = evidence.sha256(file)
+                with self.assertRaisesRegex(evidence.GateError, 'typography_numeric_invalid|nonfinite_json_number'):
+                    validate_visual_contract(self.root, job, state, {})
 
     def test_pause_resume_rechecks_inputs(self) -> None:
         self.generate()
