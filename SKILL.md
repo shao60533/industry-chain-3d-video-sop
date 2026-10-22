@@ -17,7 +17,7 @@ Codex 是主执行者，专业工具按实际环境执行。保留用户指定�
 
 1. 阅读 [Codex 工作流](docs/codex-workflow.md)、[制作 SOP](docs/production-sop.md)与[质量验收](docs/acceptance.md)。视觉决策另读[视觉质量](docs/visual-quality.md)、[视觉工程节点](docs/visual-quality-workflow.md)，组件覆盖另读[组件契约](docs/component-scope-contract.md)。新增方法见[制作复盘](docs/production-lessons.md)、[《奇点》镜头手册](docs/singularity-blender-production.md)、[材质布光](docs/material-lighting-calibration.md)与[语义配音](docs/speech-production.md)。
 2. 用 `.venv/bin/python scripts/init_job.py --output <新目录> --content-kind <题材> --visual-style <画风>` 建立本地任务，独立填写来源、题目、修订和成本/权限依据。job.json是唯一任务/状态源；所有模板保持pending，默认produce_only，拒绝覆盖。
-3. 完整读源，先交付具体判断、低模预演/分镜关键帧、语义配音计划与试听、难例样片；3D保留三类产品图、真实展开/环绕/合体，白板检查图表口径、图示关系和渐进揭示。批准绑定版本，再全片。数字/单位/字幕独立确定性合成，禁用可辨识人物头像；按镜头选方法，不强制图生视频。
+3. 完整读源，先交付具体判断、低模预演/分镜关键帧、语义配音计划与试听、难例样片；3D先按制作SOP完成高清产品原图/结构图调研、实际查看和特征采用对照，再保留三类产品图、真实展开/环绕/合体，白板检查图表口径、图示关系和渐进揭示。批准绑定版本，再全片。数字/单位/字幕独立确定性合成，禁用可辨识人物头像；按镜头选方法，不强制图生视频。
 4. 使用真实文件及 SHA 完成证据。自检记 self_review；没有实际听看能力、连续播放或设备证据的项目保持 pending。工具退出成功和模板填满不能替代真实质量检查。
 5. 发布前另读[发布 SOP](docs/publication-sop.md)，核已有授权与当前冻结包；提交未知只读恢复。安装环境不配置账号，不上传音色，不产生发布权限。
 
