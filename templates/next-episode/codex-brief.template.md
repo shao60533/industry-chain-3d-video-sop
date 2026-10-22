@@ -23,3 +23,5 @@ Agent负责当前步骤内部执行；Workflow凭版本证据推进。先稿件�
 ## 2026-10-21 · 制作方法与声音计划
 
 先按[制作复盘](../../docs/production-lessons.md)在既有film-plan/visual_contract填写主判断、空间/景别、动作/停稳、光材与标注。3D采用[《奇点》方法](../../docs/singularity-blender-production.md)，先低模全片预演、代表难镜lookdev，再精模/长渲染。按[语义配音](../../docs/speech-production.md)生成新的speech-plan.json，绑定当前稿件/音频/时点与逐段真实审听证明后再作为D输出登记；E和最终报告保留拼接连听。模板保持pending，平台、账号和音色由本期自行配置。
+
+高清产品参考（2026-10-22）：建模前按[高清产品图调研](../../docs/production-sop.md#高清产品图调研)搜集官网原图、结构/装配图及关键功能近景，核实际像素与目标区域清晰度；记录来源/原文件SHA、型号、采用特征和component/shot映射。参考图必须落实到模型及镜头对照，不能只留链接或缩略图。
