@@ -18,7 +18,7 @@ step-evidence / step-approval保存早期步骤证据及具体输入/输出版�
 4. 在 job.voice_lock 填入自行提供并获授权的本地音色参考及实际SHA。先做30–60秒试听，接受后再填speed。
 5. 做同一母产品的整体/拆解/内部功能图，封面独立设计，可另设模型镜头或使用生成式封面；按[视觉基准](../../docs/visual-quality.md)与实际光模块、用户指定的相关封面及编码近景作200/390px同宽对照。填写visual-review.template.json的具体判断，再分件建模；封面不充当模型交付，不能直接套用最大展开图或只验标题可读。
 6. opening-cues按帧号做独立9.5秒无口播样片：真实展开、短悬停环绕、真实合体，节奏音乐带动展开/环绕/合体，轻音效跟动作落点，接第一句本人旁白。BPM按本期选，不照搬120；当前cue是设计，尚未渲染/实听。
-7. 样片含两行长字幕、财务卡、问答、部件图注和结构动作。先锁safe-layout.template.json及字体SHA测bounds，360/390宽带遮罩和实际界面验收，再长渲染；子模块有参考和成片可见近景。
+7. 样片含最长单行字幕、财务卡、问答、部件图注和结构动作。先锁safe-layout.template.json及字体SHA测bounds，360/390宽带遮罩和实际界面验收，再长渲染；子模块有参考和成片可见近景。
 8. 全片导出layout.jsonl，绑定当前视频/profile/spec/全依赖SHA填12项证据。缺项pending；可交本地审阅包。必须接入完整checker并完成实际领域验收才可release_ready与冻结，本包结构校验不能代替。
 9. H manifest含production_acceptance，由Codex调用自行配置的质量预检通过后再启动平台适配器；原授权/话题/群/封面/AI/定时/单次attempt不省。
 
