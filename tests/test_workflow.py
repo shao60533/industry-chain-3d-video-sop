@@ -403,6 +403,31 @@ class WorkflowTests(unittest.TestCase):
                 with self.assertRaisesRegex(evidence.GateError, 'typography_numeric_invalid|nonfinite_json_number'):
                     validate_visual_contract(self.root, job, state, {})
 
+    def test_caption_lines_default_single_and_allow_two(self) -> None:
+        from visual_contract import validate_visual_contract
+        for step in 'AB': self.generate(step); self.accept(step)
+        self.generate('C')
+        job = self.read(self.job); state = job['workflow']['steps']['C']
+        file = self.root / state['outputs']['visual_contract']['path']; original = self.read(file)
+        profile_file = self.root / state['inputs']['profile']['path']; profile = self.read(profile_file)
+        self.assertEqual(profile['caption_max_lines'], 1)
+        def bind(value):
+            self.write(profile_file, dict(profile, caption_max_lines=value))
+            state['inputs']['profile']['sha256'] = evidence.sha256(profile_file)
+            contract = copy.deepcopy(original)
+            contract['bindings']['profile'] = state['inputs']['profile']['sha256']
+            contract['typography']['caption_max_lines'] = value; self.write(file, contract)
+            state['outputs']['visual_contract']['sha256'] = evidence.sha256(file)
+        for value in (1, 2):
+            with self.subTest(accepted=value):
+                bind(value)
+                validate_visual_contract(self.root, job, state, {})
+        for value in (0, 3, True, '1'):
+            with self.subTest(rejected=value):
+                bind(value)
+                with self.assertRaisesRegex(evidence.GateError, 'typography_readability_invalid'):
+                    validate_visual_contract(self.root, job, state, {})
+
     def test_pause_resume_rechecks_inputs(self) -> None:
         self.generate()
         self.run_action("pause", reason="local pause")

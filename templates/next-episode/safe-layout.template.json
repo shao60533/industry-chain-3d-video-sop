@@ -54,7 +54,7 @@
     1350
   ],
   "caption_min_font_size": 56,
-  "caption_max_lines": 2,
+  "caption_max_lines": 1,
   "card_caption_gap": 24,
   "review_phone_widths": [
     360,

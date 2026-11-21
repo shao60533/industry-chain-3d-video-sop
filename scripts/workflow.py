@@ -61,7 +61,7 @@ POLICY_FILES = ("scripts/workflow.py", "scripts/evidence.py", "docs/codex-workfl
                 "docs/component-scope-contract.md", "docs/visual-quality.md",
                 "scripts/visual_contract.py", "docs/visual-quality-workflow.md", "scripts/spoken_callouts.py", "scripts/speech_plan.py",
                 "docs/singularity-blender-production.md", "docs/material-lighting-calibration.md",
-                "docs/production-lessons.md", "docs/speech-production.md")
+                "docs/production-lessons.md", "docs/speech-production.md", "docs/gold-standards.md")
 
 
 def policy_sha256() -> str:

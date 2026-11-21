@@ -68,7 +68,7 @@ class RepositoryTests(unittest.TestCase):
 
     def test_new_method_documents_are_part_of_the_pinned_policy(self) -> None:
         documents = ("docs/singularity-blender-production.md", "docs/material-lighting-calibration.md",
-                     "docs/production-lessons.md", "docs/speech-production.md")
+                     "docs/production-lessons.md", "docs/speech-production.md", "docs/gold-standards.md")
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             for name in workflow.POLICY_FILES:

@@ -29,7 +29,7 @@ def validate_visual_contract(root: Path, job: dict, state: dict, snapshot: dict)
             all(finite_number(x) and x > 0 for x in canvas) and
             isinstance(bounds, list) and len(bounds) == 4 and
             all(finite_number(x) for x in bounds), 'typography_geometry_invalid')
-    require(profile['caption_max_lines'] == 2 and profile['caption_min_font_size'] >= 42,
+    require(type(profile['caption_max_lines']) is int and profile['caption_max_lines'] in (1, 2) and profile['caption_min_font_size'] >= 42,
             'typography_readability_invalid')
     require(type(profile['caption_center_tolerance_px']) in (int, float) and 0 <= profile['caption_center_tolerance_px'] <= 2,
             'typography_center_tolerance_invalid')
