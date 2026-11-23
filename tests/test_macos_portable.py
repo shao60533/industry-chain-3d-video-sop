@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 from pathlib import Path
 import re
 import sys
@@ -16,6 +18,7 @@ import setup
 
 
 class MacPortableTests(unittest.TestCase):
+    # Progress lines are Chinese; a Windows CI console code page cannot encode them, so they are captured.
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -52,7 +55,7 @@ class MacPortableTests(unittest.TestCase):
         with patch.object(setup.platform, "system", return_value="Darwin"), \
              patch.object(setup.platform, "machine", return_value="arm64"), \
              patch.object(setup, "download", download), patch.object(setup, "run", run), \
-             patch.object(setup.subprocess, "run") as detach:
+             patch.object(setup.subprocess, "run") as detach, contextlib.redirect_stdout(io.StringIO()):
             extra = setup.install_system_tools(self.destination, ["blender", "ffmpeg", "ffprobe"])
         table = setup.MAC_TOOLS["arm64"]
         self.assertEqual({checksum for _, checksum in downloads}, {checksum for _, checksum in table.values()})
@@ -75,7 +78,8 @@ class MacPortableTests(unittest.TestCase):
                 bundle.writestr(output.stem, "binary")
 
         with patch.object(setup.platform, "system", return_value="Darwin"), \
-             patch.object(setup.platform, "machine", return_value="x86_64"), patch.object(setup, "download", download):
+             patch.object(setup.platform, "machine", return_value="x86_64"), patch.object(setup, "download", download), \
+             contextlib.redirect_stdout(io.StringIO()):
             extra = setup.install_system_tools(self.destination, ["ffprobe"])
         self.assertEqual(list(extra), ["ffprobe"])
         self.assertEqual(downloads, [setup.MAC_TOOLS["x64"]["ffprobe"][0]])
