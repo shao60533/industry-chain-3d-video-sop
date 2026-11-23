@@ -107,7 +107,7 @@ def smoke_test(tools: dict[str, str], artifacts_dir: Path | None = None) -> dict
         run([tools["ffmpeg"], "-v", "error", "-y", "-loop", "1", "-framerate", "24",
              "-i", str(directory / "frame.png"), "-f", "lavfi", "-i",
              "sine=frequency=440:sample_rate=48000:duration=1", "-t", "1",
-             "-vf", "scale=in_range=pc:out_range=tv:out_color_matrix=bt709",
+             "-vf", "scale=in_range=pc:out_range=tv:out_color_matrix=bt709,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709",
              "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac",
              "-x264-params", "colorprim=bt709:transfer=bt709:colormatrix=bt709:fullrange=off",
              "-color_range", "tv", "-colorspace", "bt709", "-color_primaries", "bt709",
