@@ -2,6 +2,10 @@
 
 ## 未发布
 
+### 自检兼容 Blender 5.x
+
+- Blender 5.x 输出的 PNG 带 sRGB 传递特性标记，FFmpeg 会把它带进 H.264 码流，自检的 BT.709 检查因此失败。自检的编码命令现在用 `setparams` 明确写入 BT.709 的原色、传递特性和矩阵；检查本身没有放宽。已用 Blender 5.3 和 4.5.14 各实跑一次。
+
 ### macOS 安装不再需要 Homebrew 和管理员密码
 
 - 新 Mac 上缺 Python、FFmpeg 或 Blender 时，安装器改为把固定版本下载到技能目录并核对 SHA256：独立 Python 3.13（python-build-standalone）、FFmpeg/ffprobe 静态构建、Blender 4.5.14 官方安装包。不再安装 Homebrew，不改动系统软件；已有的工具照常复用。
