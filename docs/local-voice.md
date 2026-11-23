@@ -107,4 +107,4 @@ curl -fsSL https://raw.githubusercontent.com/shao60533/industry-chain-3d-video-s
 
 ## 验证范围
 
-在一台 Apple 芯片 Mac 上实际跑过：建立 `.venv-voice`、安装固定依赖、`check`、`prepare` 和 `speak`，合成结果用本地转写核过文字一致。当时模型已在本机缓存，约 6 GB 的首次下载没有重新走一遍；带 `--with-voice` 的一条命令完整安装、以及 16 GB 以下内存的机器也没有验证。CI 只运行不依赖模型的单元测试，不下载模型，也不做听感判断。
+在一台 Apple 芯片 Mac（32 GB 内存）上实际跑过：用空白用户目录执行带 `--with-voice` 的一条安装命令、重复安装、`check`、`prepare` 和 `speak`，合成结果用本地转写核过文字一致。当时模型已在本机缓存，约 6 GB 的首次下载没有重新走一遍；16 GB 及以下内存的机器没有验证。CI 只运行不依赖模型的单元测试，不下载模型，也不做听感判断。

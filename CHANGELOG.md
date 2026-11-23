@@ -2,6 +2,13 @@
 
 ## 未发布
 
+### macOS 安装不再需要 Homebrew 和管理员密码
+
+- 新 Mac 上缺 Python、FFmpeg 或 Blender 时，安装器改为把固定版本下载到技能目录并核对 SHA256：独立 Python 3.13（python-build-standalone）、FFmpeg/ffprobe 静态构建、Blender 4.5.14 官方安装包。不再安装 Homebrew，不改动系统软件；已有的工具照常复用。
+- `/usr/bin/python3` 在未装命令行工具的 Mac 上只会弹出安装对话框，引导脚本现在跳过它。
+- 虚拟环境改由技能目录内的 Python 建立，引导用的临时副本删除后环境仍可用。
+- macOS 的 FFmpeg 构建来自第三方个人维护者，文档写明来源、固定方式和替换方法。
+
 ### 本地配音（可选）
 
 - 安装器新增 `--with-voice`：在 Apple 芯片的 Mac 上另建 `.venv-voice`，安装固定版本依赖并下载固定版本的 Qwen3-TTS 模型（约 6 GB）。不加该参数时安装内容不变；其他系统明确报告不支持。

@@ -59,6 +59,7 @@ def find_tool(name: str, saved: dict | None = None) -> str | None:
     if name == "blender":
         # Prefer the real binary to GUI command wrappers, particularly on macOS.
         candidates += [
+            ROOT / ".local/tools/Blender.app/Contents/MacOS/Blender",
             Path("/Applications/Blender.app/Contents/MacOS/Blender"),
             Path.home() / "Applications/Blender.app/Contents/MacOS/Blender",
         ]
@@ -69,6 +70,8 @@ def find_tool(name: str, saved: dict | None = None) -> str | None:
                     candidates += sorted(base.glob("Blender Foundation/Blender */blender.exe"), reverse=True)
         executable = "blender.exe" if platform.system() == "Windows" else "blender"
         candidates += sorted((ROOT / ".local/tools").glob(f"blender*/{executable}"))
+    if name in ("ffmpeg", "ffprobe"):
+        candidates.append(ROOT / ".local/tools/ffmpeg" / (f"{name}.exe" if platform.system() == "Windows" else name))
     found = shutil.which(name)
     if found:
         candidates.append(Path(found))
