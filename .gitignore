@@ -35,6 +35,7 @@ recordings/
 
 # Installer-generated local state and isolated Python dependencies
 .venv/
+.venv-voice/
 .local/
 .skill-installation.json
 local-skill/

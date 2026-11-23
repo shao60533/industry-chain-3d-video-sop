@@ -38,7 +38,7 @@
 curl -fsSL https://raw.githubusercontent.com/shao60533/industry-chain-3d-video-sop/main/install.sh | bash
 ```
 
-安装器复用已有工具，自动补齐缺失依赖；不会索取 token、上传音色或配置平台账号。Windows PowerShell、离线工具配置、版本选择与权限说明见 [完整安装指南](docs/installation.md)。安装后在下一个 Codex 回合使用 **`$industry-chain-3d-video`**。
+安装器复用已有工具，自动补齐缺失依赖；不会索取 token、上传音色或配置平台账号。想用自己的声音配音，在 Apple 芯片的 Mac 上给安装命令加 `--with-voice`（终端写法是 `| bash -s -- --with-voice`），录音和合成都留在本机，步骤见[本地配音](docs/local-voice.md)。Windows PowerShell、离线工具配置、版本选择与权限说明见 [完整安装指南](docs/installation.md)。安装后在下一个 Codex 回合使用 **`$industry-chain-3d-video`**。
 
 doctor检查实际中文像素并拒绝缺字方框；最小CPU自检渲染原始Cycles画面，另验工程重开、编码与全解码。可保留自检产物供实际查看，具体命令见安装指南；环境ready不证明GPU、降噪或成片质量。
 

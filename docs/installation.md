@@ -34,22 +34,23 @@ Windows PowerShell：
 | 内容 | 安装方式 |
 |---|---|
 | Codex 技能 | 默认 `${CODEX_HOME:-~/.codex}/skills/industry-chain-3d-video`；支持自定义目录 |
-| Python | 需要 3.11+；已有版本复用，缺失由 Homebrew/apt/winget 准备 |
-| Blender | 复用 3.6+；缺失时 macOS 用 Homebrew，Linux x64 / Windows x64、ARM64 下载官方 4.5.14 LTS 便携版并核 SHA256 |
-| FFmpeg / ffprobe | 复用可运行版本；缺失通过 Homebrew、apt 或 winget 安装，最后验证 H.264/AAC 实际能力 |
+| Python | 需要 3.11+；已有版本复用。macOS 缺失时下载固定版本的独立 Python 3.13 到技能目录并核 SHA256；Linux 用 apt，Windows 用 winget |
+| Blender | 复用 3.6+；缺失时下载官方 4.5.14 LTS 并核 SHA256：macOS 取官方安装包里的应用放进技能目录，Linux x64 / Windows x64、ARM64 用便携版 |
+| FFmpeg / ffprobe | 复用可运行版本；macOS 缺失时下载固定版本的静态构建到技能目录并核 SHA256，Linux 用 apt，Windows 用 winget；最后验证 H.264/AAC 实际能力 |
 | Pillow | 固定 12.3.0，仅安装在技能的 `.venv`，不修改系统 Python 包 |
 | 中文字体 | 固定 Noto Sans CJK SC 原件和 SHA，下载 OFL 许可到本地字体目录；可指定已有字体 |
+| 本地配音（可选） | 加 `--with-voice` 才安装；仅 Apple 芯片 Mac；独立 `.venv-voice`、固定版本依赖和约 6 GB 模型，见[本地配音](local-voice.md) |
 | 自检 | 中文实际像素及缺字检查、原始Cycles CPU渲染及非空像素、工程重开、24帧 H.264/AAC 编码、BT.709 标记与全解码 |
 
-包管理器可能需要操作系统管理员权限。安装器不接收或保存管理员密码；没有权限时报告缺口。Homebrew 的初次安装需按其系统要求完成，Linux 非 root 用户可能收到正常 sudo 提示。Windows 的 FFmpeg/Python 安装依赖 App Installer（winget）。
+macOS 上整个安装不使用 Homebrew，也不需要管理员密码：缺少的 Python、FFmpeg 和 Blender 都下载到技能目录的 `.local/tools`，不改动系统软件；已经装好的 Homebrew 版工具会照常复用。Linux 的包管理器可能需要管理员权限，非 root 用户可能收到正常 sudo 提示。安装器不接收或保存管理员密码；没有权限时报告缺口。Windows 的 FFmpeg/Python 安装依赖 App Installer（winget）。
 
 ## 支持与验证范围
 
-- macOS：Apple Silicon 实机验证过完整安装、重复安装、Blender 4.5.14 与 FFmpeg 8.1 的真实渲染/编码；Intel 由 Homebrew 当前支持范围决定。
+- macOS：在一台 Apple Silicon Mac 上，用空白用户目录和最小 PATH（没有 Homebrew，系统 Python 为 3.9）实际跑过一条命令的完整安装和重复安装：独立 Python 3.13.18、Blender 4.5.14、FFmpeg 9.1 均下载到技能目录，真实渲染/编码自检通过，全程没有管理员密码提示。Intel Mac 的下载项已固定版本和 SHA256，但没有实机验证；所用 FFmpeg 构建的维护者已说明 2027 年 1 月起不再提供 Intel 发行版。未装命令行工具的全新系统没有实机验证，只按该情况跳过了系统自带的 python3。
 - Linux：Debian/Ubuntu 自动依赖安装；Python 应为3.11+，官方便携 Blender 下载支持 x64。Linux ARM64 和其他发行版可配置现有工具后使用 `--skip-system-deps`。
 - Windows：PowerShell 入口、winget 依赖和官方便携 Blender；不配置额外模型或账号。代码与跨平台行为测试进入 CI，完整 Windows 渲染安装尚未在本次实机验证。
 
-Blender 与 FFmpeg 来自各自维护者和包管理器；其许可独立于本仓库 MIT。下载来源见 [Blender LTS](https://www.blender.org/download/LTS/)、[Homebrew Blender](https://formulae.brew.sh/cask/blender)、[Homebrew FFmpeg](https://formulae.brew.sh/formula/ffmpeg)、[Noto CJK](https://github.com/notofonts/noto-cjk)。这些依赖不会作为二进制文件提交本仓库。
+Blender 与 FFmpeg 来自各自维护者和包管理器；其许可独立于本仓库 MIT。下载来源见 [Blender LTS](https://www.blender.org/download/LTS/)、[python-build-standalone](https://github.com/astral-sh/python-build-standalone)、[Noto CJK](https://github.com/notofonts/noto-cjk)。macOS 的 FFmpeg 来自 [Martin Riedl 的静态构建](https://ffmpeg.martin-riedl.de/)：这是第三方个人维护的构建，FFmpeg 官方只发布源码；安装器固定到具体构建并核对该站公布的 SHA256，不跟随 latest。不想用它的，先自行安装 FFmpeg 或用 `VIDEO_SOP_FFMPEG` / `VIDEO_SOP_FFPROBE` 指定已有文件，安装器就不会下载。这些依赖不会作为二进制文件提交本仓库。
 
 ## 已有工具或自定义目录
 
@@ -60,7 +61,7 @@ bash install.sh --dest ./local-skill --skip-system-deps
 bash install.sh --dry-run
 ```
 
-Windows 对应参数为 `-Dest ./local-skill -SkipSystemDeps`、`-DryRun`。默认仍会建立独立 Python 环境、获取字体并自检；`--skip-system-deps` 只表示不修改系统软件，缺失依赖会明确失败。`--no-smoke` / `-NoSmoke` 仅检查环境，不执行实际渲染。测试报告据此记录实际范围。
+Windows 对应参数为 `-Dest ./local-skill -SkipSystemDeps`、`-DryRun`。`--with-voice` 只在 macOS 入口提供。默认仍会建立独立 Python 环境、获取字体并自检；`--skip-system-deps` 只表示不修改系统软件，缺失依赖会明确失败。`--no-smoke` / `-NoSmoke` 仅检查环境，不执行实际渲染。测试报告据此记录实际范围。
 
 可通过本地环境变量指定工具文件：`VIDEO_SOP_PYTHON`、`VIDEO_SOP_BLENDER`、`VIDEO_SOP_FFMPEG`、`VIDEO_SOP_FFPROBE`、`VIDEO_SOP_FONT`。变量取文件路径，不填密钥；不需要公开配置。
 

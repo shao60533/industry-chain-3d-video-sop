@@ -16,15 +16,32 @@ import tempfile
 import venv
 import zipfile
 
+from local_voice import MODEL_ID as VOICE_MODEL, supported as voice_supported
 from runtime import BLENDER_STARTUP_TIMEOUT, PILLOW_VERSION, ROOT, SKILL_NAME, find_tool, python_in, run, safe_message, version
 
 PAYLOAD = ("SKILL.md", "agents", "docs", "profiles", "templates", "scripts", "tests", "assets",
-           "requirements.txt", "LICENSE", "README.md", "AGENTS.md", "SECURITY.md",
+           "requirements.txt", "requirements-voice.txt", "LICENSE", "README.md", "AGENTS.md", "SECURITY.md",
            "CONTRIBUTING.md", "CHANGELOG.md", "install.sh", "install.ps1", ".gitignore")
 FONT_COMMIT = "f8d157532fbfaeda587e826d4cd5b21a49186f7c"
 FONT_URL = f"https://raw.githubusercontent.com/notofonts/noto-cjk/{FONT_COMMIT}/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf"
 FONT_SHA = "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
 BLENDER_VERSION = "4.5.14"
+MAC_TOOLS = {
+    "arm64": {
+        "blender": ("blender-4.5.14-macos-arm64.dmg", "65134d9b07b20e2fa8d3c9e44f6f44ffb5c9774dd521b95f50387310241ca170"),
+        "ffmpeg": ("https://ffmpeg.martin-riedl.de/download/macos/arm64/1795207104_9.1/ffmpeg.zip",
+                   "1f66e9a690a7f1c9e60b012379f8869c11818d1797f45b21dbb2f2564ba61ae1"),
+        "ffprobe": ("https://ffmpeg.martin-riedl.de/download/macos/arm64/1795207104_9.1/ffprobe.zip",
+                    "6ef2df5f575042923a28537ab37adf936f28bf3e7b85de23a1447ed447ec1dbd"),
+    },
+    "x64": {
+        "blender": ("blender-4.5.14-macos-x64.dmg", "613e73339e97bd113adeeb28d9155beeacf2df7119ee4dbd6bdce234843645f6"),
+        "ffmpeg": ("https://ffmpeg.martin-riedl.de/download/macos/amd64/1795212433_9.1/ffmpeg.zip",
+                   "35b3d82cccc2c1d644d49d15f5e57eb913a08ef68f798042c90eecec62c51f1e"),
+        "ffprobe": ("https://ffmpeg.martin-riedl.de/download/macos/amd64/1795212433_9.1/ffprobe.zip",
+                    "41ca7b7cba7992e33f1da3f1bf54db8ec103a4d387b1bfac3162062e8b1074ad"),
+    },
+}
 BLENDER_HASHES = {
     "linux-x64.tar.xz": "9ba871ff2ecd36526b77432745980b7e6664ecd0c7ca11c48849073dcfe06da3",
     "windows-x64.zip": "b9533d2397ac1984db4466fb23a7a4649391cca93f6e84209f9bcc60d071c8b9",
@@ -83,12 +100,12 @@ def copy_payload(source: Path, destination: Path) -> list[str]:
     return managed
 
 
-def download(url: str, output: Path, checksum: str | None = None) -> None:
+def download(url: str, output: Path, checksum: str | None = None, limit: int = 900) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     part = output.with_name(output.name + ".part")
     try:
         run(["curl", "--fail", "--location", "--proto", "=https", "--tlsv1.2", "--retry", "2",
-             "--connect-timeout", "20", "--max-time", "900", "--output", str(part), url], timeout=920)
+             "--connect-timeout", "20", "--max-time", str(limit), "--output", str(part), url], timeout=limit + 20)
         if checksum:
             with part.open("rb") as stream:
                 actual = hashlib.file_digest(stream, "sha256").hexdigest()
@@ -146,20 +163,43 @@ def install_system_tools(destination: Path, missing: list[str]) -> dict[str, str
     system = platform.system()
     extra: dict[str, str] = {}
     if system == "Darwin":
-        brew = shutil.which("brew") or next((str(p) for p in (Path("/opt/homebrew/bin/brew"), Path("/usr/local/bin/brew")) if p.is_file()), None)
-        if brew is None:
-            print("准备官方 Homebrew 安装工具", flush=True)
-            with tempfile.TemporaryDirectory(prefix="homebrew-setup-") as temporary:
-                script = Path(temporary) / "install.sh"
-                download("https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh", script)
-                run(["env", "NONINTERACTIVE=1", "/bin/bash", str(script)], timeout=1800)
-            brew = next((str(p) for p in (Path("/opt/homebrew/bin/brew"), Path("/usr/local/bin/brew")) if p.is_file()), None)
-            if brew is None:
-                raise RuntimeError("Homebrew 初次安装需要系统权限；请完成官方安装后重试")
-        if "blender" in missing:
-            run([brew, "install", "--cask", "blender"], timeout=1800)
-        if any(name in missing for name in ("ffmpeg", "ffprobe")):
-            run([brew, "install", "ffmpeg"], timeout=1800)
+        # Pinned downloads into the skill directory: no Homebrew, no administrator password.
+        machine = platform.machine().lower()
+        table = MAC_TOOLS.get("arm64" if machine in ("arm64", "aarch64") else "x64" if machine in ("amd64", "x86_64") else "")
+        if table is None:
+            raise RuntimeError("此 Mac 架构没有内置下载项；请先安装 Blender 与 FFmpeg 并配置 VIDEO_SOP_BLENDER / VIDEO_SOP_FFMPEG / VIDEO_SOP_FFPROBE")
+        tools = destination / ".local/tools"
+        with tempfile.TemporaryDirectory(prefix="mac-tools-") as temporary:
+            for name in ("ffmpeg", "ffprobe"):
+                if name in missing:
+                    url, checksum = table[name]
+                    print(f"下载 {name}（固定版本并核对 SHA256）", flush=True)
+                    archive = Path(temporary) / f"{name}.zip"
+                    download(url, archive, checksum)
+                    extract_archive(archive, tools / "ffmpeg")
+                    binary = tools / "ffmpeg" / name
+                    if not binary.is_file() or binary.is_symlink():
+                        raise RuntimeError(f"{name} 解压后缺少可执行文件")
+                    binary.chmod(0o755)
+                    extra[name] = str(binary)
+            if "blender" in missing:
+                name, checksum = table["blender"]
+                print("下载 Blender 官方安装包（约 400 MB，固定版本并核对 SHA256）", flush=True)
+                image = Path(temporary) / name
+                download(f"https://download.blender.org/release/Blender4.5/{name}", image, checksum, limit=3600)
+                mount = Path(temporary) / "mount"
+                mount.mkdir()
+                application = tools / "Blender.app"
+                if application.is_symlink():
+                    raise RuntimeError("本地 Blender 目录不能是符号链接")
+                run(["/usr/bin/hdiutil", "attach", "-nobrowse", "-readonly", "-noautoopen", "-mountpoint", str(mount), str(image)], timeout=600)
+                try:
+                    if application.exists():
+                        shutil.rmtree(application)
+                    run(["/usr/bin/ditto", str(mount / "Blender.app"), str(application)], timeout=1200)
+                finally:
+                    subprocess.run(["/usr/bin/hdiutil", "detach", str(mount), "-force"], capture_output=True)
+                extra["blender"] = str(application / "Contents/MacOS/Blender")
     elif system == "Linux":
         if shutil.which("apt-get") is None:
             raise RuntimeError("自动系统安装支持 Debian/Ubuntu；其他 Linux 请配置现有 Blender/FFmpeg 后加 --skip-system-deps")
@@ -196,18 +236,62 @@ def install_system_tools(destination: Path, missing: list[str]) -> dict[str, str
     return extra
 
 
-def install(destination: Path, skip_system: bool, smoke: bool) -> dict:
+def base_python(destination: Path) -> str:
+    """The interpreter environments are built from: the bundled one when present, since a bootstrap copy is temporary."""
+    bundled = destination / ".local/tools/python/bin/python3"
+    return str(bundled) if bundled.is_file() else sys.executable
+
+
+def create_environment(environment: Path, destination: Path) -> None:
+    base = base_python(destination)
+    if base == sys.executable:
+        venv.EnvBuilder(with_pip=True).create(environment)
+    else:
+        run([base, "-m", "venv", str(environment)], timeout=600)
+
+
+def install_voice(destination: Path) -> dict:
+    """Optional: a separate environment and a pinned model; the user's recording is not involved here."""
+    if not voice_supported():
+        raise RuntimeError("本地配音目前只支持 Apple 芯片的 Mac；其他系统请接入自己获授权的配音工具")
+    environment = destination / ".venv-voice"
+    if environment.is_symlink():
+        raise RuntimeError("本地配音的虚拟环境不能是符号链接")
+    python = python_in(environment)
+    if not python.is_file():
+        print("建立本地配音的独立 Python 环境", flush=True)
+        create_environment(environment, destination)
+    script = str(destination / "scripts/local_voice.py")
+    print("安装本地配音依赖", flush=True)
+    run([str(python), "-m", "pip", "install", "--disable-pip-version-check", "-r",
+         str(destination / "requirements-voice.txt")], timeout=1800)
+    print("下载配音模型（约 6 GB，只在第一次下载；不上传任何录音）", flush=True)
+    try:
+        run([str(python), script, "fetch-model"], timeout=4 * 3600)
+    except RuntimeError as exc:
+        raise RuntimeError("配音模型下载未完成；检查网络后重新运行同一条安装命令，已下载的部分会续传") from exc
+    report = json.loads(run([str(python), script, "check"], timeout=120))
+    if not report.get("ready"):
+        raise RuntimeError("本地配音自检未通过")
+    return report
+
+
+def install(destination: Path, skip_system: bool, smoke: bool, voice: bool = False, python_archive: Path | None = None) -> dict:
     if sys.version_info < (3, 11):
         raise RuntimeError("Python 需要 3.11 或更新版本，请使用统一安装入口")
     guard_destination(ROOT, destination)
     local = destination / ".local"
     environment = destination / ".venv"
-    for path in (local, environment, local / "fonts", local / "tools", local / "environment.json",
+    for path in (local, environment, destination / ".venv-voice", local / "fonts", local / "tools", local / "environment.json",
                  local / "doctor.json", destination / ".skill-installation.json"):
         if path.is_symlink():
             raise RuntimeError("本地状态或虚拟环境不能是符号链接")
     managed = copy_payload(ROOT, destination)
     local.mkdir(mode=0o700, exist_ok=True)
+    if python_archive is not None and not (local / "tools/python/bin/python3").is_file():
+        if (local / "tools/python").is_symlink():
+            raise RuntimeError("本地 Python 目录不能是符号链接")
+        extract_archive(python_archive, local / "tools")
     marker = destination / ".skill-installation.json"
     marker.write_text(json.dumps({"skill": SKILL_NAME, "managed_files": managed}, indent=2) + "\n", encoding="utf-8")
     saved = json.loads((local / "environment.json").read_text(encoding="utf-8")) if (local / "environment.json").is_file() else {}
@@ -248,7 +332,7 @@ def install(destination: Path, skip_system: bool, smoke: bool) -> dict:
     if not python.is_file():
         print("建立独立 Python 环境", flush=True)
         try:
-            venv.EnvBuilder(with_pip=True).create(environment)
+            create_environment(environment, destination)
         except subprocess.CalledProcessError as exc:
             if platform.system() != "Linux" or skip_system:
                 raise RuntimeError("无法建立 venv，请先安装当前 Python 对应的 venv/ensurepip") from exc
@@ -280,6 +364,11 @@ def install(destination: Path, skip_system: bool, smoke: bool) -> dict:
         raise
     if not result["ready"]:
         raise RuntimeError("环境自检未通过；查看本地 .local/doctor.json 的未就绪项目")
+    if voice:
+        try:
+            result["local_voice"] = install_voice(destination)
+        except RuntimeError as exc:
+            raise RuntimeError(f"基础环境已装好，本地配音未完成：{exc}") from exc
     return result
 
 
@@ -288,6 +377,8 @@ def main() -> int:
     parser.add_argument("--dest", type=Path, default=default_destination())
     parser.add_argument("--skip-system-deps", action="store_true", help="只复用现有 Blender/FFmpeg，不修改系统软件")
     parser.add_argument("--no-smoke", action="store_true", help="仅检查依赖，不执行渲染和编码")
+    parser.add_argument("--with-voice", action="store_true", help="另装本地配音（仅 Apple 芯片 Mac，模型约 6 GB）")
+    parser.add_argument("--python-archive", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--dry-run", action="store_true", help="仅显示计划，不安装或写文件")
     args = parser.parse_args()
     destination = args.dest.expanduser().absolute()
@@ -298,14 +389,17 @@ def main() -> int:
             guard_destination(ROOT, destination)
             print(json.dumps({"skill": SKILL_NAME, "platform": platform.system(), "python": "3.11+",
                               "dependencies": ["Blender", "FFmpeg/ffprobe", f"Pillow {PILLOW_VERSION}", "Noto Sans CJK SC"],
-                              "modify_system": not args.skip_system_deps, "smoke_test": not args.no_smoke}, ensure_ascii=False, indent=2))
+                              "modify_system": not args.skip_system_deps, "smoke_test": not args.no_smoke,
+                              "local_voice": {"model": VOICE_MODEL, "platform_supported": voice_supported()} if args.with_voice else None}, ensure_ascii=False, indent=2))
             return 0
-        report = install(destination, args.skip_system_deps, not args.no_smoke)
+        report = install(destination, args.skip_system_deps, not args.no_smoke, args.with_voice, args.python_archive)
     except (RuntimeError, OSError, ValueError, subprocess.CalledProcessError, zipfile.BadZipFile, tarfile.TarError) as exc:
         print("安装未完成：" + safe_message(str(exc)))
         return 1
     print(json.dumps(report, ensure_ascii=False, indent=2))
     print("技能已安装。下一个 Codex 回合可使用 $industry-chain-3d-video。")
+    if args.with_voice:
+        print("本地配音已就绪。录音与试听步骤见 docs/local-voice.md。")
     return 0
 
 
