@@ -16,10 +16,11 @@ import tempfile
 import venv
 import zipfile
 
+from local_voice import MODEL_ID as VOICE_MODEL, supported as voice_supported
 from runtime import BLENDER_STARTUP_TIMEOUT, PILLOW_VERSION, ROOT, SKILL_NAME, find_tool, python_in, run, safe_message, version
 
 PAYLOAD = ("SKILL.md", "agents", "docs", "profiles", "templates", "scripts", "tests", "assets",
-           "requirements.txt", "LICENSE", "README.md", "AGENTS.md", "SECURITY.md",
+           "requirements.txt", "requirements-voice.txt", "LICENSE", "README.md", "AGENTS.md", "SECURITY.md",
            "CONTRIBUTING.md", "CHANGELOG.md", "install.sh", "install.ps1", ".gitignore")
 FONT_COMMIT = "f8d157532fbfaeda587e826d4cd5b21a49186f7c"
 FONT_URL = f"https://raw.githubusercontent.com/notofonts/noto-cjk/{FONT_COMMIT}/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf"
@@ -196,13 +197,39 @@ def install_system_tools(destination: Path, missing: list[str]) -> dict[str, str
     return extra
 
 
-def install(destination: Path, skip_system: bool, smoke: bool) -> dict:
+def install_voice(destination: Path) -> dict:
+    """Optional: a separate environment and a pinned model; the user's recording is not involved here."""
+    if not voice_supported():
+        raise RuntimeError("本地配音目前只支持 Apple 芯片的 Mac；其他系统请接入自己获授权的配音工具")
+    environment = destination / ".venv-voice"
+    if environment.is_symlink():
+        raise RuntimeError("本地配音的虚拟环境不能是符号链接")
+    python = python_in(environment)
+    if not python.is_file():
+        print("建立本地配音的独立 Python 环境", flush=True)
+        venv.EnvBuilder(with_pip=True).create(environment)
+    script = str(destination / "scripts/local_voice.py")
+    print("安装本地配音依赖", flush=True)
+    run([str(python), "-m", "pip", "install", "--disable-pip-version-check", "-r",
+         str(destination / "requirements-voice.txt")], timeout=1800)
+    print("下载配音模型（约 6 GB，只在第一次下载；不上传任何录音）", flush=True)
+    try:
+        run([str(python), script, "fetch-model"], timeout=4 * 3600)
+    except RuntimeError as exc:
+        raise RuntimeError("配音模型下载未完成；检查网络后重新运行同一条安装命令，已下载的部分会续传") from exc
+    report = json.loads(run([str(python), script, "check"], timeout=120))
+    if not report.get("ready"):
+        raise RuntimeError("本地配音自检未通过")
+    return report
+
+
+def install(destination: Path, skip_system: bool, smoke: bool, voice: bool = False) -> dict:
     if sys.version_info < (3, 11):
         raise RuntimeError("Python 需要 3.11 或更新版本，请使用统一安装入口")
     guard_destination(ROOT, destination)
     local = destination / ".local"
     environment = destination / ".venv"
-    for path in (local, environment, local / "fonts", local / "tools", local / "environment.json",
+    for path in (local, environment, destination / ".venv-voice", local / "fonts", local / "tools", local / "environment.json",
                  local / "doctor.json", destination / ".skill-installation.json"):
         if path.is_symlink():
             raise RuntimeError("本地状态或虚拟环境不能是符号链接")
@@ -280,6 +307,11 @@ def install(destination: Path, skip_system: bool, smoke: bool) -> dict:
         raise
     if not result["ready"]:
         raise RuntimeError("环境自检未通过；查看本地 .local/doctor.json 的未就绪项目")
+    if voice:
+        try:
+            result["local_voice"] = install_voice(destination)
+        except RuntimeError as exc:
+            raise RuntimeError(f"基础环境已装好，本地配音未完成：{exc}") from exc
     return result
 
 
@@ -288,6 +320,7 @@ def main() -> int:
     parser.add_argument("--dest", type=Path, default=default_destination())
     parser.add_argument("--skip-system-deps", action="store_true", help="只复用现有 Blender/FFmpeg，不修改系统软件")
     parser.add_argument("--no-smoke", action="store_true", help="仅检查依赖，不执行渲染和编码")
+    parser.add_argument("--with-voice", action="store_true", help="另装本地配音（仅 Apple 芯片 Mac，模型约 6 GB）")
     parser.add_argument("--dry-run", action="store_true", help="仅显示计划，不安装或写文件")
     args = parser.parse_args()
     destination = args.dest.expanduser().absolute()
@@ -298,14 +331,17 @@ def main() -> int:
             guard_destination(ROOT, destination)
             print(json.dumps({"skill": SKILL_NAME, "platform": platform.system(), "python": "3.11+",
                               "dependencies": ["Blender", "FFmpeg/ffprobe", f"Pillow {PILLOW_VERSION}", "Noto Sans CJK SC"],
-                              "modify_system": not args.skip_system_deps, "smoke_test": not args.no_smoke}, ensure_ascii=False, indent=2))
+                              "modify_system": not args.skip_system_deps, "smoke_test": not args.no_smoke,
+                              "local_voice": {"model": VOICE_MODEL, "platform_supported": voice_supported()} if args.with_voice else None}, ensure_ascii=False, indent=2))
             return 0
-        report = install(destination, args.skip_system_deps, not args.no_smoke)
+        report = install(destination, args.skip_system_deps, not args.no_smoke, args.with_voice)
     except (RuntimeError, OSError, ValueError, subprocess.CalledProcessError, zipfile.BadZipFile, tarfile.TarError) as exc:
         print("安装未完成：" + safe_message(str(exc)))
         return 1
     print(json.dumps(report, ensure_ascii=False, indent=2))
     print("技能已安装。下一个 Codex 回合可使用 $industry-chain-3d-video。")
+    if args.with_voice:
+        print("本地配音已就绪。录音与试听步骤见 docs/local-voice.md。")
     return 0
 
 

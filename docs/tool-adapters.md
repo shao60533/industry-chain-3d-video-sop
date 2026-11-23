@@ -5,6 +5,7 @@
 | 本包工具 | 实际职责 |
 |---|---|
 | install.sh / install.ps1 / scripts/setup.py | 安装 Codex 技能、基础依赖、独立 Python 环境和中文字体 |
+| scripts/local_voice.py（可选，`--with-voice`） | Apple 芯片 Mac 上把本人录音整理成音色目录并离线合成试听；量时长、音量和爆音，记录 SHA；不判断像不像、读得对不对，听感检查保持 pending |
 | scripts/doctor.py | 验依赖、实际中文像素与缺字，原始Cycles CPU渲染及像素、重开工程、编码与全解码；不签发GPU/降噪能力或成片质量 |
 | scripts/init_job.py | 建立新任务目录和 pending 模板，拒绝覆盖已有任务 |
 | scripts/workflow.py | job.json内的A–E版本准出、F产物登记、暂停/失败回流/有限恢复；不执行生成工具，不推进最终G/H |

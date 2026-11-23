@@ -39,6 +39,7 @@ Windows PowerShell：
 | FFmpeg / ffprobe | 复用可运行版本；缺失通过 Homebrew、apt 或 winget 安装，最后验证 H.264/AAC 实际能力 |
 | Pillow | 固定 12.3.0，仅安装在技能的 `.venv`，不修改系统 Python 包 |
 | 中文字体 | 固定 Noto Sans CJK SC 原件和 SHA，下载 OFL 许可到本地字体目录；可指定已有字体 |
+| 本地配音（可选） | 加 `--with-voice` 才安装；仅 Apple 芯片 Mac；独立 `.venv-voice`、固定版本依赖和约 6 GB 模型，见[本地配音](local-voice.md) |
 | 自检 | 中文实际像素及缺字检查、原始Cycles CPU渲染及非空像素、工程重开、24帧 H.264/AAC 编码、BT.709 标记与全解码 |
 
 包管理器可能需要操作系统管理员权限。安装器不接收或保存管理员密码；没有权限时报告缺口。Homebrew 的初次安装需按其系统要求完成，Linux 非 root 用户可能收到正常 sudo 提示。Windows 的 FFmpeg/Python 安装依赖 App Installer（winget）。
@@ -60,7 +61,7 @@ bash install.sh --dest ./local-skill --skip-system-deps
 bash install.sh --dry-run
 ```
 
-Windows 对应参数为 `-Dest ./local-skill -SkipSystemDeps`、`-DryRun`。默认仍会建立独立 Python 环境、获取字体并自检；`--skip-system-deps` 只表示不修改系统软件，缺失依赖会明确失败。`--no-smoke` / `-NoSmoke` 仅检查环境，不执行实际渲染。测试报告据此记录实际范围。
+Windows 对应参数为 `-Dest ./local-skill -SkipSystemDeps`、`-DryRun`。`--with-voice` 只在 macOS 入口提供。默认仍会建立独立 Python 环境、获取字体并自检；`--skip-system-deps` 只表示不修改系统软件，缺失依赖会明确失败。`--no-smoke` / `-NoSmoke` 仅检查环境，不执行实际渲染。测试报告据此记录实际范围。
 
 可通过本地环境变量指定工具文件：`VIDEO_SOP_PYTHON`、`VIDEO_SOP_BLENDER`、`VIDEO_SOP_FFMPEG`、`VIDEO_SOP_FFPROBE`、`VIDEO_SOP_FONT`。变量取文件路径，不填密钥；不需要公开配置。
 

@@ -1,0 +1,7 @@
+# Optional local voice (Apple Silicon only); isolated in the skill's .venv-voice.
+mlx==0.32.2
+mlx-audio==0.5.5
+numpy==2.5.4
+soundfile==0.14.0
+transformers==5.17.0
+huggingface_hub==1.32.0
